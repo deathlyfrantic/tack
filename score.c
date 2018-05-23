@@ -14,24 +14,35 @@ Score *score_new() {
   return score;
 }
 
+static char *strtolower(const char *s) {
+  char *rv = calloc(strlen(s), sizeof(char));
+  for (size_t i = 0; i < strlen(s); i++) {
+    rv[i] = tolower(s[i]);
+  }
+  return rv;
+}
+
 static int find_char_idx(const char *s, char c) {
-  printf("finding char %c in %s\n", c, s);
+  int rv = -1;
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == c) {
-      return i;
+      rv = i;
+      break;
     }
   }
-  return -1;
+  return rv;
 }
 
 static bool single_char_query(Score *score, const char *query) {
   int idx;
-  if ((idx = find_char_idx(score->line, query[0])) == -1) {
+  char *line = strtolower(score->line);
+  if ((idx = find_char_idx(line, query[0])) == -1) {
     return false;
   }
   score->first = idx;
   score->last = idx;
   score->points = 1;
+  free(line);
   return true;
 }
 
@@ -70,19 +81,21 @@ static bool find_end_of_match(struct match *m, const char *line,
       last_match_type = MATCH_TYPE_NORMAL;
       score += index - last_index;
     }
-    last_index = index;
+    last_index = index + 1;
   }
   m->score = score;
   m->last = last_index;
   return true;
 }
 
-static bool regular_query(Score *score, const char *query) {
+static bool regular_query(Score *score, const char *_query) {
   bool found_score = false;
   struct match m;
-  for (size_t i = 0; i < strlen(score->line); i++) {
-    if (score->line[i] == query[0]) {
-      if (find_end_of_match(&m, score->line, query + 1, i)) {
+  char *line = strtolower(score->line);
+  char *query = strtolower(_query);
+  for (size_t i = 0; i < strlen(line); i++) {
+    if (line[i] == query[0]) {
+      if (find_end_of_match(&m, line, query + 1, i)) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
@@ -92,6 +105,8 @@ static bool regular_query(Score *score, const char *query) {
       }
     }
   }
+  free(line);
+  free(query);
   return found_score;
 }
 
