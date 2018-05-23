@@ -51,19 +51,32 @@ int main(int argc, char *argv[]) {
   // for (size_t i = 0; i < lines->length; i++) {
   //   printf("line %zd: %s\n", i, lines->items[i]);
   // }
-  List *scores = list_new_of_size(100);
-
-  for (size_t i = 0; i < lines->length; i++) {
-    Score *score = calculate_score(lines->items[i], "foobar");
-    if (score != NULL) {
-      list_push(scores, score);
-    }
-  }
-
-  scores = list_filter(list_map(lines, map_score), filter_out_null_scores);
-
   printf("lines read: %zd\n", lines->length);
-  printf("lines matched \"foobar\": %zd\n", lines->length);
+
+  // List *scores = list_new_of_size(100);
+
+  // for (size_t i = 0; i < lines->length; i++) {
+  //   Score *score = calculate_score(lines->items[i], "foobar");
+  //   if (score != NULL) {
+  //     list_push(scores, score);
+  //   }
+  // }
+
+  List *scores =
+      list_filter(list_map(lines, map_score), filter_out_null_scores);
+
+  printf("lines matched \"foobar\": %zd\n", scores->length);
+  // Score *score;
+  // for (size_t i = 0; i < scores->length; i++) {
+  //   score = scores->items[i];
+  //   for (size_t j = 0; j < strlen(score->line); j++) {
+  //     if (score->first == j || score->last == j - 1) {
+  //       printf(" <|> ");
+  //     }
+  //     printf("%c", score->line[j]);
+  //   }
+  //   printf("\n");
+  // }
   free(lines);
   return EXIT_SUCCESS;
 }
