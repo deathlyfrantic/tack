@@ -1,6 +1,7 @@
 #include "list.h"
 #include "score.h"
 #include "test.h"
+#include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -93,4 +94,47 @@ void test_list_sort_by_score() {
   free(score1);
   free(score2);
   free(score3);
+}
+
+static void *test_list_map_to_upper(void *_s) {
+  char *s = (char *)_s;
+  char *rv = calloc(strlen(s), sizeof(char));
+  for (size_t i = 0; i < strlen(s); i++) {
+    rv[i] = toupper(s[i]);
+  }
+  return (char *)rv;
+}
+
+void test_list_map() {
+  List *list = list_new();
+  list_push(list, "foo");
+  list_push(list, "bar");
+  list_push(list, "baz");
+  list_push(list, "quux");
+  List *uppers = list_map(list, test_list_map_to_upper);
+  assert(uppers->length == 4);
+  assert(strcmp(uppers->items[0], "FOO") == 0);
+  assert(strcmp(uppers->items[1], "BAR") == 0);
+  assert(strcmp(uppers->items[2], "BAZ") == 0);
+  assert(strcmp(uppers->items[3], "QUUX") == 0);
+}
+
+static bool test_list_filter_filterer(const void *x) {
+  return *(int *)x % 2 == 0;
+}
+
+void test_list_filter() {
+  List *list = list_new();
+  int a = 1, b = 2, c = 3, d = 4, e = 5, f = 6;
+  list_push(list, &a);
+  list_push(list, &b);
+  list_push(list, &c);
+  list_push(list, &d);
+  list_push(list, &e);
+  list_push(list, &f);
+  List *evens = list_filter(list, test_list_filter_filterer);
+  assert(evens->length == 3);
+  assert(*(int *)evens->items[0] == 2);
+  assert(*(int *)evens->items[1] == 4);
+  assert(*(int *)evens->items[2] == 6);
 }

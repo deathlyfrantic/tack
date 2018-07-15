@@ -97,39 +97,3 @@ void _list_log(const char *name, List *list) {
   }
   printf("\n");
 }
-
-// static void *strtoupper(void *_s) {
-//   char *s = (char *)_s;
-//   char *rv = calloc(strlen(s), sizeof(char));
-//   for (size_t i = 0; i < strlen(s); i++) {
-//     rv[i] = toupper(s[i]);
-//   }
-//   return (char *)rv;
-// }
-
-// static bool strcontains(const char *s, char c) {
-//   return find_char_idx(s, c) > -1;
-// }
-
-// static bool x(const void *s) { return strcontains((char *)s, 'x'); }
-
-// int main(int argc, char *argv[]) {
-//   List *list = list_new();
-//   list_push(list, "one");
-//   list_push(list, "x two");
-//   list_push(list, "three");
-//   list_push(list, "x four");
-
-//   List *uppers = list_map(list, strtoupper);
-//   List *has_xes = list_filter(list, x);
-
-//   list_log(list);
-//   list_log(uppers);
-//   list_log(has_xes);
-//   printf("list_pop list %s\n", list_pop(list));
-//   printf("list_pop list %s\n", list_pop(list));
-//   printf("list_pop list %s\n", list_pop(list));
-//   list_log(list);
-
-//   return EXIT_SUCCESS;
-// }
