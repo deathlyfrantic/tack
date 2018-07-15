@@ -9,7 +9,7 @@ typedef struct {
   size_t length;
   size_t capacity;
   void **items;
-  size_t _size;
+  size_t size;
 } List;
 
 List *list_new();
