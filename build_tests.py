@@ -4,9 +4,14 @@ from os import path
 
 INCLUDE_PATHS = ['include', 'test']
 TEST_RUNNER = 'testrunner'
-HEADER_TEMPLATE = """#include "test.h"
+HEADER_TEMPLATE = """#ifndef ___TESTS_H
+#define ___TESTS_H
+
+#include "test.h"
 
 {declarations}
+
+#endif /* end of include guard: ___TESTS_H */
 """
 C_FILE_TEMPLATE = """#include "__tests.h"
 
