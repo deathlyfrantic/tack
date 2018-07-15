@@ -4,7 +4,7 @@ default_target:
 	cc -Iinclude/ $(wildcard *.c) -o tack
 
 .PHONY: test
-test:
+test: clean
 	exec $(shell python3 build_tests.py)
 	./testrunner
 
