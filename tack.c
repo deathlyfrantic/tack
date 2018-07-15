@@ -53,17 +53,16 @@ int main(int argc, char *argv[]) {
   // }
   printf("lines read: %zd\n", lines->length);
 
-  // List *scores = list_new_of_size(100);
-
-  // for (size_t i = 0; i < lines->length; i++) {
-  //   Score *score = calculate_score(lines->items[i], "foobar");
-  //   if (score != NULL) {
-  //     list_push(scores, score);
-  //   }
-  // }
-
-  List *scores =
-      list_filter(list_map(lines, map_score), filter_out_null_scores);
+  List *scores = list_new_of_size(100);
+  Score *score;
+  for (size_t i = 0; i < lines->length; i++) {
+    score = calculate_score(lines->items[i], "foobar");
+    if (score != NULL) {
+      list_push(scores, score);
+    }
+  }
+  // Scores *scores =
+  //     list_filter(list_map(lines, map_score), filter_out_null_scores);
 
   printf("lines matched \"foobar\": %zd\n", scores->length);
   // Score *score;

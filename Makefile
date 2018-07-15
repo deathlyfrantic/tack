@@ -1,4 +1,12 @@
 SHELL = /bin/sh
 
 default_target:
-	cc $(wildcard *.c) -o tack
+	cc -Iinclude/ $(wildcard *.c) -o tack
+
+.PHONY: test
+test:
+	exec $(shell python3 build_tests.py)
+	./testrunner
+
+clean:
+	rm -f test/__tests.{c,h} testrunner tack

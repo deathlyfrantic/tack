@@ -1,5 +1,6 @@
 #include "list.h"
 #include "score.h"
+#include "util.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -91,14 +92,13 @@ void list_sort_by_score(List *list) {
 void _list_log(const char *name, List *list) {
   printf("[List \"%s\" (%p)]", name, list);
   if (list != NULL) {
-    printf(" length: %zu; capacity: %zu; _size: %zu\n", list->length,
+    printf(" length: %zu; capacity: %zu; _size: %zu", list->length,
            list->capacity, list->_size);
     for (size_t i = 0; i < list->length; i++) {
       printf("  item %zu: %s\n", i, list->items[i]);
     }
-  } else {
-    printf("\n");
   }
+  printf("\n");
 }
 
 // static void *strtoupper(void *_s) {
@@ -111,12 +111,7 @@ void _list_log(const char *name, List *list) {
 // }
 
 // static bool strcontains(const char *s, char c) {
-//   for (size_t i = 0; i < strlen(s); i++) {
-//     if (s[i] == c) {
-//       return true;
-//     }
-//   }
-//   return false;
+//   return find_char_idx(s, c) > -1;
 // }
 
 // static bool x(const void *s) { return strcontains((char *)s, 'x'); }
