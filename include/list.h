@@ -23,6 +23,6 @@ void list_sort(List *, int (*)(const void *, const void *));
 void list_sort_by_score(List *);
 void _list_log(const char *, List *);
 
-#define list_log(a) _list_log(a);
+#define list_log(a) _list_log(#a, a);
 
 #endif /* end of include guard: _LIST_H */

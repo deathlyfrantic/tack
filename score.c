@@ -1,50 +1,10 @@
 #include "score.h"
+#include "util.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-Score *score_new() {
-  Score *score = malloc(sizeof(Score));
-  score->points = UINT_MAX;
-  score->first = 0;
-  score->last = 0;
-  score->line = NULL;
-  return score;
-}
-
-static char *strtolower(const char *s) {
-  char *rv = calloc(strlen(s), sizeof(char));
-  for (size_t i = 0; i < strlen(s); i++) {
-    rv[i] = tolower(s[i]);
-  }
-  return rv;
-}
-
-static int find_char_idx(const char *s, char c) {
-  int rv = -1;
-  for (size_t i = 0; i < strlen(s); i++) {
-    if (s[i] == c) {
-      rv = i;
-      break;
-    }
-  }
-  return rv;
-}
-
-static bool single_char_query(Score *score, const char *query) {
-  int idx;
-  char *line = strtolower(score->line);
-  if ((idx = find_char_idx(line, query[0])) == -1) {
-    return false;
-  }
-  score->first = idx;
-  score->last = idx;
-  score->points = 1;
-  free(line);
-  return true;
-}
 
 struct match {
   unsigned int score;
@@ -56,6 +16,29 @@ enum match_type {
   MATCH_TYPE_BOUNDARY,
   MATCH_TYPE_NORMAL,
 };
+
+Score *score_new() {
+  Score *score = malloc(sizeof(Score));
+  score->points = UINT_MAX;
+  score->first = 0;
+  score->last = 0;
+  score->line = NULL;
+  return score;
+}
+
+static bool single_char_query(Score *score, const char *query) {
+  int idx;
+  char *line = strtolower(score->line);
+  bool rv = false;
+  if ((idx = find_char_idx(line, query[0])) != -1) {
+    score->first = idx;
+    score->last = idx;
+    score->points = 1;
+    rv = true;
+  }
+  free(line);
+  return rv;
+}
 
 static bool find_end_of_match(struct match *m, const char *line,
                               const char *query, unsigned int start) {
@@ -116,22 +99,20 @@ Score *calculate_score(const char *line, const char *query) {
 
   switch (strlen(query)) {
   case 0:
-    break;
+    return score;
 
   case 1:
-    if (!single_char_query(score, query)) {
-      goto no_match;
+    if (single_char_query(score, query)) {
+      return score;
     }
+    break;
 
   default:
-    if (!regular_query(score, query)) {
-      goto no_match;
+    if (regular_query(score, query)) {
+      return score;
     }
   }
 
-  return score;
-
-no_match:
   free(score);
   return NULL;
 }
@@ -139,11 +120,10 @@ no_match:
 void _score_log(const char *name, Score *score) {
   printf("[Score \"%s\" (%p)]", name, score);
   if (score != NULL) {
-    printf(" points %d; first %d; last %d; line \"%s\"\n", score->points,
+    printf(" points %d; first %d; last %d; line \"%s\"", score->points,
            score->first, score->last, score->line);
-  } else {
-    printf("\n");
   }
+  printf("\n");
 }
 
 // int main(int argc, char *argv[]) {
