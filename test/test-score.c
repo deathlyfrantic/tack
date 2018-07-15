@@ -1,8 +1,7 @@
 #include "score.h"
 #include "test.h"
-#include <string.h>
-
 #include <limits.h>
+#include <string.h>
 
 void test_score_new() {
   Score *score = score_new();
