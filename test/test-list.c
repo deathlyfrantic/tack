@@ -45,7 +45,7 @@ void test_list_pop() {
   assert(list->length == 1);
 }
 
-int test_list_sort_cmp(const void *_a, const void *_b) {
+static int test_list_sort_cmp(const void *_a, const void *_b) {
   int a = *(int *)_a;
   int b = *(int *)_b;
   return a == b ? 0 : a < b ? 1 : -1;
