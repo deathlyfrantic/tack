@@ -7,7 +7,7 @@
 #include <string.h>
 
 static void list_grow(List *list) {
-  list->capacity += list->_size;
+  list->capacity += list->size;
   list->items = realloc(list->items, sizeof(void *) * list->capacity);
 }
 
@@ -17,7 +17,7 @@ List *list_new_of_size(size_t size) {
   List *list = malloc(sizeof(List));
   list->length = 0;
   list->capacity = size;
-  list->_size = size;
+  list->size = size;
   list->items = calloc(list->capacity, sizeof(void *));
   return list;
 }
@@ -25,9 +25,6 @@ List *list_new_of_size(size_t size) {
 void list_free(List *list) {
   if (list == NULL) {
     return;
-  }
-  for (size_t i = 0; i < list->length; i++) {
-    free(list->items[i]);
   }
   free(list->items);
   free(list);
@@ -52,7 +49,7 @@ void *list_pop(List *list) {
 }
 
 List *list_filter(List *list, bool (*f)(const void *)) {
-  List *rv = list_new_of_size(list->_size);
+  List *rv = list_new_of_size(list->size);
   for (size_t i = 0; i < list->length; i++) {
     if (f(list->items[i])) {
       list_push(rv, list->items[i]);
@@ -62,7 +59,7 @@ List *list_filter(List *list, bool (*f)(const void *)) {
 }
 
 List *list_map(List *list, void *(*f)(void *)) {
-  List *rv = list_new_of_size(list->_size);
+  List *rv = list_new_of_size(list->size);
   for (size_t i = 0; i < list->length; i++) {
     list_push(rv, f(list->items[i]));
   }
@@ -80,8 +77,8 @@ static int _list_sort_by_score_cmp(const void *_a, const void *_b) {
   if (_a == NULL || _b == NULL) {
     return 0;
   }
-  Score *a = (Score *)_a;
-  Score *b = (Score *)_b;
+  Score *a = *(Score **)_a;
+  Score *b = *(Score **)_b;
   return a->points == b->points ? 0 : a->points > b->points ? 1 : -1;
 }
 
@@ -93,7 +90,7 @@ void _list_log(const char *name, List *list) {
   printf("[List \"%s\" (%p)]", name, list);
   if (list != NULL) {
     printf(" length: %zu; capacity: %zu; _size: %zu", list->length,
-           list->capacity, list->_size);
+           list->capacity, list->size);
     for (size_t i = 0; i < list->length; i++) {
       printf("  item %zu: %s\n", i, list->items[i]);
     }
