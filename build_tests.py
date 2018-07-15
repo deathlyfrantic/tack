@@ -29,7 +29,7 @@ def make_c_file(test_functions):
 
 
 def create_compile_command(test_files):
-    cfiles = [f.lstrip('test/test-') for f in test_files]
+    cfiles = [f.replace('test/test-', '') for f in test_files]
     files = ' '.join(list(test_files) + cfiles +
                      ['test/__tests.c', 'test/test.c'])
     includes = ' '.join(f'-I{i}/' for i in INCLUDE_PATHS)
@@ -44,8 +44,8 @@ def main():
         with open(test_file) as f:
             for line in f.readlines():
                 if line.startswith('void test_'):
-                    test_functions.append(
-                        line.lstrip('void ').rstrip('() {\n'))
+                    func = line.partition('()')[0]
+                    test_functions.append(func.replace('void ', ''))
                     files_to_include.add(test_file)
 
     make_header_file(test_functions)
