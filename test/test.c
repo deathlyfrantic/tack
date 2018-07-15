@@ -37,9 +37,11 @@ int main(int argc, char *argv[]) {
            "--------\n");
     for (size_t i = 0; i < failures->length; i++) {
       TestFailure *failure = failures->items[i];
-      printf("[%s:%d:%s()] - \"%s\"", failure->file, failure->line,
+      printf("[%s:%d:%s()] - \"%s\"\n", failure->file, failure->line,
              failure->func, failure->assertion);
     }
     printf("\n");
+    return EXIT_FAILURE;
   }
+  return EXIT_SUCCESS;
 }
