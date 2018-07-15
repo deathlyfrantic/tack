@@ -30,7 +30,7 @@ static bool single_char_query(Score *score, const char *query) {
   int idx;
   char *line = strtolower(score->line);
   bool rv = false;
-  if ((idx = find_char_idx(line, query[0])) != -1) {
+  if ((idx = find_char_idx(line, tolower(query[0]))) != -1) {
     score->first = idx;
     score->last = idx;
     score->points = 1;
@@ -64,7 +64,7 @@ static bool find_end_of_match(struct match *m, const char *line,
       last_match_type = MATCH_TYPE_NORMAL;
       score += index - last_index;
     }
-    last_index = index + 1;
+    last_index = index;
   }
   m->score = score;
   m->last = last_index;
@@ -125,31 +125,3 @@ void _score_log(const char *name, Score *score) {
   }
   printf("\n");
 }
-
-// int main(int argc, char *argv[]) {
-//   Score *a = calculate_score("foo", "qxz");
-//   printf("query: \"qxz\"\nshould be: none\n");
-//   score_log(a);
-//   printf("\n\n");
-
-//   Score *b = calculate_score("oof", "f");
-//   printf("query: \"f\"\nshould be: P1 F2 L2\n");
-//   score_log(b);
-//   printf("\n\n");
-
-//   Score *c = calculate_score("foofbbar", "fob");
-//   printf("query: \"fob\"\nshould be: P5 F0 L4\n");
-//   score_log(c);
-//   printf("\n\n");
-
-//   Score *d = calculate_score("foo / ba r", "or");
-//   printf("query: \"or\"\nshould be: P2 F1 L9\n");
-//   score_log(d);
-//   printf("\n\n");
-
-//   Score *e = calculate_score("f||||||||b||||||||||||||a||||f||||||||r",
-//   "bar"); printf("query: \"bar\"\nshould be: P2 F9 L38\n"); score_log(e);
-//   printf("\n\n");
-
-//   return EXIT_SUCCESS;
-// }
