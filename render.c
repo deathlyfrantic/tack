@@ -32,11 +32,11 @@ char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
 }
 
 char *expand_tabs(const char *s) {
-  size_t length = 0;
+  size_t length = 1; // account for \0
   for (size_t i = 0; i < strlen(s); i++) {
     length += (s[i] == '\t') ? 8 : 1;
   }
-  char *rv = malloc(sizeof(char) * length + 1); // + 1 for \0
+  char *rv = malloc(sizeof(char) * length);
   size_t cursor = 0;
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == '\t') {
