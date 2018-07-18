@@ -11,7 +11,7 @@ typedef struct {
   int line;
 } TestFailure;
 
-#define assert(a)                                                              \
+#define test_assert(a)                                                         \
   _test_assertion(#a, a,                                                       \
                   strrchr(__FILE__, '/') != NULL ? strrchr(__FILE__, '/') + 1  \
                                                  : __FILE__,                   \

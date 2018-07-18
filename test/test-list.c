@@ -7,43 +7,43 @@
 
 void test_list_new_of_size() {
   List *list = list_new_of_size(27);
-  assert(list->length == 0);
-  assert(list->capacity == 27);
-  assert(list->size == 27);
+  test_assert(list->length == 0);
+  test_assert(list->capacity == 27);
+  test_assert(list->size == 27);
 }
 
 void test_list_new() {
   List *list = list_new();
-  assert(list->size == 10);
+  test_assert(list->size == 10);
 }
 
 void test_list_grow() {
   List *list = list_new_of_size(1);
   list_push(list, "foo");
-  assert(list->length == 1);
-  assert(list->capacity == 1);
+  test_assert(list->length == 1);
+  test_assert(list->capacity == 1);
   list_push(list, "bar");
-  assert(list->length == 2);
-  assert(list->capacity == 2);
+  test_assert(list->length == 2);
+  test_assert(list->capacity == 2);
 }
 
 void test_list_push() {
   List *list = list_new();
-  assert(list->length == 0);
+  test_assert(list->length == 0);
   list_push(list, "foo");
-  assert(list->length == 1);
-  assert(strcmp(list->items[0], "foo") == 0);
+  test_assert(list->length == 1);
+  test_assert(strcmp(list->items[0], "foo") == 0);
 }
 
 void test_list_pop() {
   List *list = list_new();
-  assert(list->length == 0);
+  test_assert(list->length == 0);
   list_push(list, "foo");
   list_push(list, "bar");
-  assert(list->length == 2);
+  test_assert(list->length == 2);
   const char *item = list_pop(list);
-  assert(strcmp(item, "bar") == 0);
-  assert(list->length == 1);
+  test_assert(strcmp(item, "bar") == 0);
+  test_assert(list->length == 1);
 }
 
 static int test_list_sort_cmp(const void *_a, const void *_b) {
@@ -60,17 +60,17 @@ void test_list_sort() {
   list_push(list, &b);
   list_push(list, &a);
   list_push(list, &e);
-  assert(*(int *)list->items[0] == 3);
-  assert(*(int *)list->items[1] == 4);
-  assert(*(int *)list->items[2] == 2);
-  assert(*(int *)list->items[3] == 1);
-  assert(*(int *)list->items[4] == 5);
+  test_assert(*(int *)list->items[0] == 3);
+  test_assert(*(int *)list->items[1] == 4);
+  test_assert(*(int *)list->items[2] == 2);
+  test_assert(*(int *)list->items[3] == 1);
+  test_assert(*(int *)list->items[4] == 5);
   list_sort(list, test_list_sort_cmp);
-  assert(*(int *)list->items[0] == 1);
-  assert(*(int *)list->items[1] == 2);
-  assert(*(int *)list->items[2] == 3);
-  assert(*(int *)list->items[3] == 4);
-  assert(*(int *)list->items[4] == 5);
+  test_assert(*(int *)list->items[0] == 1);
+  test_assert(*(int *)list->items[1] == 2);
+  test_assert(*(int *)list->items[2] == 3);
+  test_assert(*(int *)list->items[3] == 4);
+  test_assert(*(int *)list->items[4] == 5);
 }
 
 void test_list_sort_by_score() {
@@ -84,13 +84,13 @@ void test_list_sort_by_score() {
   list_push(list, score1);
   list_push(list, score2);
   list_push(list, score3);
-  assert(((Score *)list->items[0])->points == 20);
-  assert(((Score *)list->items[1])->points == 30);
-  assert(((Score *)list->items[2])->points == 10);
+  test_assert(((Score *)list->items[0])->points == 20);
+  test_assert(((Score *)list->items[1])->points == 30);
+  test_assert(((Score *)list->items[2])->points == 10);
   list_sort_by_score(list);
-  assert(((Score *)list->items[0])->points == 10);
-  assert(((Score *)list->items[1])->points == 20);
-  assert(((Score *)list->items[2])->points == 30);
+  test_assert(((Score *)list->items[0])->points == 10);
+  test_assert(((Score *)list->items[1])->points == 20);
+  test_assert(((Score *)list->items[2])->points == 30);
   free(score1);
   free(score2);
   free(score3);
@@ -112,11 +112,11 @@ void test_list_map() {
   list_push(list, "baz");
   list_push(list, "quux");
   List *uppers = list_map(list, test_list_map_to_upper);
-  assert(uppers->length == 4);
-  assert(strcmp(uppers->items[0], "FOO") == 0);
-  assert(strcmp(uppers->items[1], "BAR") == 0);
-  assert(strcmp(uppers->items[2], "BAZ") == 0);
-  assert(strcmp(uppers->items[3], "QUUX") == 0);
+  test_assert(uppers->length == 4);
+  test_assert(strcmp(uppers->items[0], "FOO") == 0);
+  test_assert(strcmp(uppers->items[1], "BAR") == 0);
+  test_assert(strcmp(uppers->items[2], "BAZ") == 0);
+  test_assert(strcmp(uppers->items[3], "QUUX") == 0);
 }
 
 static bool test_list_filter_filterer(const void *x) {
@@ -133,8 +133,8 @@ void test_list_filter() {
   list_push(list, &e);
   list_push(list, &f);
   List *evens = list_filter(list, test_list_filter_filterer);
-  assert(evens->length == 3);
-  assert(*(int *)evens->items[0] == 2);
-  assert(*(int *)evens->items[1] == 4);
-  assert(*(int *)evens->items[2] == 6);
+  test_assert(evens->length == 3);
+  test_assert(*(int *)evens->items[0] == 2);
+  test_assert(*(int *)evens->items[1] == 4);
+  test_assert(*(int *)evens->items[2] == 6);
 }
