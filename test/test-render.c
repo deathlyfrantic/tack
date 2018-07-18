@@ -18,16 +18,15 @@ void test_highlight_line() {
 
 void test_expand_tabs() {
   char expected1[] = "foo    bar";
-  char *result1 = expand_tabs("foo	bar");
+  char *result1 = expand_tabs("foo\tbar");
   assert(strcmp(expected1, result1));
   free(result1);
   char expected2[] = "bazquux        garply";
-  char *result2 = expand_tabs("bazquux	garply");
+  char *result2 = expand_tabs("bazquux\tgarply");
   assert(strcmp(expected2, result2));
   free(result2);
   char expected3[] = "foo    bar     baz     quux            garply";
-  char *result3 = expand_tabs("foo	bar	baz	quux		"
-                              "garply");
+  char *result3 = expand_tabs("foo\tbar\tbaz\tquux\t\tgarply");
   assert(strcmp(expected3, result3));
   free(result3);
 }
