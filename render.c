@@ -1,4 +1,6 @@
 #include "render.h"
+#include "score.h"
+#include "util.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,5 +52,26 @@ char *expand_tabs(const char *s) {
     }
   }
   rv[cursor] = '\0';
+  return rv;
+}
+
+Renderer *renderer_new() {
+  Renderer *r = malloc(sizeof(Renderer));
+  return r;
+}
+
+char *renderer_render(Renderer *r) {
+  char *rv = malloc(sizeof(char) * 16384); // adjust this later?
+  sprintf(rv, "%*zd > %s\n", r->match_length, r->scores->length, r->query);
+  Score *score;
+  for (size_t i = 0; i < r->height - 1 && i < r->scores->length; i++) {
+    score = r->scores->items[i];
+    char *expanded = expand_tabs(score->line);
+    char *line =
+        highlight_line(expanded, score->first, score->last, r->selected == i);
+    strcat(rv, line);
+    free(expanded);
+    free(line);
+  }
   return rv;
 }
