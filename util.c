@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include <limits.h>
+#include <stdio.h>
 #include <string.h>
 
 char *strtolower(const char *s) {
@@ -16,4 +18,10 @@ unsigned int find_char_idx(const char *s, char c) {
     }
   }
   return -1;
+}
+
+unsigned short get_num_strlen(size_t num) {
+  char buf[USHRT_MAX] = {0};
+  sprintf(buf, "%zd", num);
+  return strlen(buf);
 }
