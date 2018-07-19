@@ -1,5 +1,5 @@
-#ifndef _TEST_H
-#define _TEST_H
+#ifndef TACK_TEST_H
+#define TACK_TEST_H
 
 #include <stdbool.h>
 #include <string.h>
@@ -20,4 +20,4 @@ typedef struct {
 void _test_assertion(const char *, bool, const char *, int, const char *);
 void run_all_tests();
 
-#endif /* end of include guard: _TEST_H */
+#endif /* end of include guard: TACK_TEST_H */

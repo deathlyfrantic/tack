@@ -1,5 +1,5 @@
-#ifndef _SCORE_H
-#define _SCORE_H
+#ifndef TACK_SCORE_H
+#define TACK_SCORE_H
 
 #include <stdio.h>
 
@@ -16,4 +16,4 @@ void _score_log(const char *, Score *);
 
 #define score_log(a) _score_log(#a, a);
 
-#endif /* end of include guard: _SCORE_H */
+#endif /* end of include guard: TACK_SCORE_H */

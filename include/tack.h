@@ -1,4 +1,4 @@
-#ifndef _TACK_H
-#define _TACK_H
+#ifndef TACK_TACK_H
+#define TACK_TACK_H
 
-#endif /* end of include guard: _TACK_H */
+#endif /* end of include guard: TACK_TACK_H */
