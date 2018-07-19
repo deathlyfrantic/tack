@@ -27,7 +27,7 @@ Score *score_new() {
 }
 
 static bool single_char_query(Score *score, const char *query) {
-  int idx;
+  unsigned int idx;
   char *line = strtolower(score->line);
   bool rv = false;
   if ((idx = find_char_idx(line, tolower(query[0]))) != -1) {
