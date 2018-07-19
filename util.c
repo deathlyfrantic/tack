@@ -9,7 +9,7 @@ char *strtolower(const char *s) {
   return rv;
 }
 
-int find_char_idx(const char *s, char c) {
+unsigned int find_char_idx(const char *s, char c) {
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == c) {
       return i;
