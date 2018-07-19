@@ -1,6 +1,7 @@
 #ifndef TACK_RENDER_H
 #define TACK_RENDER_H
 
+#include "list.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -24,7 +25,17 @@
 #define COLOR_REVERSE      "\x1b[7m"
 // clang-format on
 
+typedef struct {
+  List *scores;
+  const char *query;
+  unsigned short match_length;
+  unsigned short height;
+  unsigned short selected;
+} Renderer;
+
 char *highlight_line(const char *, size_t, size_t, bool);
 char *expand_tabs(const char *);
+Renderer *renderer_new();
+char *renderer_render(Renderer *);
 
 #endif /* end of include guard: TACK_RENDER_H */
