@@ -6,8 +6,8 @@
 
 char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
   size_t length = strlen(s) +
-                  strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_RESET) +
-                  1; // + 1 for \0
+                  strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT) +
+                  2; // + 1 for \n, + 1 for \0
   char *rv = malloc(sizeof(char) * length);
   size_t cursor = strlen(COLOR_RESET);
   sprintf(rv, "%s", COLOR_RESET);
@@ -22,12 +22,13 @@ char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
         rv[cursor++] = COLOR_RED[j];
       }
     } else if (end == i) {
-      for (size_t j = 0; j < strlen(COLOR_RESET); j++) {
-        rv[cursor++] = COLOR_RESET[j];
+      for (size_t j = 0; j < strlen(COLOR_DEFAULT); j++) {
+        rv[cursor++] = COLOR_DEFAULT[j];
       }
     }
     rv[cursor++] = s[i];
   }
+  rv[cursor++] = '\n';
   rv[cursor] = '\0';
   return rv;
 }
