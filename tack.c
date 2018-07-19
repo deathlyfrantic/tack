@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-List *get_lines_from_stdin() {
+static List *get_lines_from_stdin() {
   char line[BUFSIZ];
   unsigned int cursor = 0;
   char c;
