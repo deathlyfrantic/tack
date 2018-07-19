@@ -1,5 +1,5 @@
-#ifndef _RENDER_H
-#define _RENDER_H
+#ifndef TACK_RENDER_H
+#define TACK_RENDER_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -26,4 +26,4 @@
 char *highlight_line(const char *, size_t, size_t, bool);
 char *expand_tabs(const char *);
 
-#endif /* end of include guard: _RENDER_H */
+#endif /* end of include guard: TACK_RENDER_H */

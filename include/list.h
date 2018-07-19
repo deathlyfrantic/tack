@@ -1,5 +1,5 @@
-#ifndef _LIST_H
-#define _LIST_H
+#ifndef TACK_LIST_H
+#define TACK_LIST_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -25,4 +25,4 @@ void _list_log(const char *, List *);
 
 #define list_log(a) _list_log(#a, a);
 
-#endif /* end of include guard: _LIST_H */
+#endif /* end of include guard: TACK_LIST_H */
