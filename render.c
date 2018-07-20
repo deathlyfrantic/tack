@@ -44,9 +44,9 @@ char *expand_tabs(const char *s) {
   size_t cursor = 0;
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == '\t') {
-      while (cursor % 8 != 0) {
+      do {
         rv[cursor++] = ' ';
-      }
+      } while (cursor % 8 != 0);
     } else {
       rv[cursor++] = s[i];
     }
