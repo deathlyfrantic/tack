@@ -23,7 +23,7 @@ char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
       for (size_t j = 0; j < strlen(COLOR_RED); j++) {
         rv[cursor++] = COLOR_RED[j];
       }
-    } else if (end == i) {
+    } else if (end == i - 1) {
       for (size_t j = 0; j < strlen(COLOR_DEFAULT); j++) {
         rv[cursor++] = COLOR_DEFAULT[j];
       }

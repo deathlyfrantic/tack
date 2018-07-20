@@ -9,12 +9,12 @@
 
 void test_highlight_line() {
   char expected1[] = COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "baz\n";
-  char *result1 = highlight_line("foobarbaz", 3, 6, false);
+  char *result1 = highlight_line("foobarbaz", 3, 5, false);
   test_assert(strcmp(expected1, result1) == 0);
   free(result1);
   char expected2[] =
       COLOR_RESET COLOR_REVERSE "foo" COLOR_RED "bar" COLOR_DEFAULT "baz\n";
-  char *result2 = highlight_line("foobarbaz", 3, 6, true);
+  char *result2 = highlight_line("foobarbaz", 3, 5, true);
   test_assert(strcmp(expected2, result2) == 0);
   free(result2);
 }
