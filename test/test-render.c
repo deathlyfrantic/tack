@@ -20,17 +20,17 @@ void test_highlight_line() {
 }
 
 void test_expand_tabs() {
-  char expected1[] = "foo    bar";
+  char expected1[] = "foo     bar";
   char *result1 = expand_tabs("foo\tbar");
-  test_assert(strcmp(expected1, result1));
+  test_assert(strcmp(expected1, result1) == 0);
   free(result1);
-  char expected2[] = "bazquux        garply";
+  char expected2[] = "bazquux garply";
   char *result2 = expand_tabs("bazquux\tgarply");
-  test_assert(strcmp(expected2, result2));
+  test_assert(strcmp(expected2, result2) == 0);
   free(result2);
-  char expected3[] = "foo    bar     baz     quux            garply";
+  char expected3[] = "foo     bar     baz     quux            garply";
   char *result3 = expand_tabs("foo\tbar\tbaz\tquux\t\tgarply");
-  test_assert(strcmp(expected3, result3));
+  test_assert(strcmp(expected3, result3) == 0);
   free(result3);
 }
 
