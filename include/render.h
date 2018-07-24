@@ -23,6 +23,9 @@
 #define COLOR_CYAN_BOLD    "\e[36;1m"
 #define COLOR_RESET        "\e[0m"
 #define COLOR_REVERSE      "\e[7m"
+#define HIDE_CURSOR        "\e[?25l"
+#define SHOW_CURSOR        "\e[?25h"
+#define CLEAR_LINE         "\e[0K"
 // clang-format on
 
 typedef struct {

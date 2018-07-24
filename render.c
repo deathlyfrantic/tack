@@ -71,16 +71,32 @@ Renderer *renderer_new() {
 
 char *renderer_render(Renderer *r) {
   char *rv = malloc(sizeof(char) * 16384); // adjust this later?
-  sprintf(rv, "%*zd > %s\n", r->match_length, r->scores->length, r->query);
+  sprintf(rv, "%s\r\n", HIDE_CURSOR);
   Score *score;
-  for (size_t i = 0; i < r->height - 1 && i < r->scores->length; i++) {
-    score = r->scores->items[i];
-    char *expanded = expand_tabs(score->line);
-    char *line =
-        highlight_line(expanded, score->first, score->last, r->selected == i);
-    strcat(rv, line);
-    free(expanded);
-    free(line);
+  const bool has_query = strlen(r->query) > 0;
+  for (size_t i = 0; i < r->height - 1; i++) {
+    if (r->scores->length > i) {
+      score = r->scores->items[i];
+      char *expanded = expand_tabs(score->line);
+      char *line = highlight_line(expanded, score->first, score->last,
+                                  r->selected == i, has_query);
+      strcat(rv, line);
+      free(line);
+      free(expanded);
+    } else {
+      strcat(rv, CLEAR_LINE "\r\n");
+    }
   }
+  char clear[10] = "";
+  memset(clear, 0, 10);
+  sprintf(clear, "\e[%zdA", (size_t)r->height);
+  strcat(rv, clear);
+  size_t length =
+      strlen(r->query) + strlen(" > " SHOW_CURSOR CLEAR_LINE) + r->match_length;
+  char prompt[length];
+  memset(prompt, 0, length);
+  sprintf(prompt, "%*zd > %s%s%s", r->match_length, r->scores->length, r->query,
+          SHOW_CURSOR, CLEAR_LINE);
+  strcat(rv, prompt);
   return rv;
 }
