@@ -6,11 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
+char *highlight_line(const char *s, size_t beg, size_t end, bool selected,
+                     bool has_query) {
   size_t length = strlen(s) +
-                  strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT) +
-                  2; // + 1 for \n, + 1 for \0
+                  strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
+                             COLOR_RESET CLEAR_LINE) +
+                  3; // + 2 for \r\n, + 1 for \0
   char *rv = malloc(sizeof(char) * length);
+  memset(rv, 0, length);
   size_t cursor = strlen(COLOR_RESET);
   sprintf(rv, "%s", COLOR_RESET);
   if (selected) {
@@ -18,20 +21,26 @@ char *highlight_line(const char *s, size_t beg, size_t end, bool selected) {
       rv[cursor++] = COLOR_REVERSE[i];
     }
   }
-  for (size_t i = 0; i < strlen(s); i++) {
-    if (beg == i) {
-      for (size_t j = 0; j < strlen(COLOR_RED); j++) {
-        rv[cursor++] = COLOR_RED[j];
+  if (has_query) {
+    for (size_t i = 0; i < strlen(s); i++) {
+      if (beg == i) {
+        for (size_t j = 0; j < strlen(COLOR_RED); j++) {
+          rv[cursor++] = COLOR_RED[j];
+        }
+      } else if (end == i) {
+        for (size_t j = 0; j < strlen(COLOR_DEFAULT); j++) {
+          rv[cursor++] = COLOR_DEFAULT[j];
+        }
       }
-    } else if (end == i - 1) {
-      for (size_t j = 0; j < strlen(COLOR_DEFAULT); j++) {
-        rv[cursor++] = COLOR_DEFAULT[j];
-      }
+      rv[cursor++] = s[i];
     }
-    rv[cursor++] = s[i];
+  } else {
+    strcat(rv, s);
   }
-  rv[cursor++] = '\n';
-  rv[cursor] = '\0';
+  if (selected) {
+    strcat(rv, COLOR_RESET);
+  }
+  strcat(rv, CLEAR_LINE "\r\n");
   return rv;
 }
 

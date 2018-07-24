@@ -8,15 +8,20 @@
 #include <string.h>
 
 void test_highlight_line() {
-  char expected1[] = COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "baz\n";
-  char *result1 = highlight_line("foobarbaz", 3, 5, false);
+  char expected1[] =
+      COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "baz" CLEAR_LINE "\r\n";
+  char *result1 = highlight_line("foobarbaz", 3, 6, false, true);
   test_assert(strcmp(expected1, result1) == 0);
   free(result1);
-  char expected2[] =
-      COLOR_RESET COLOR_REVERSE "foo" COLOR_RED "bar" COLOR_DEFAULT "baz\n";
-  char *result2 = highlight_line("foobarbaz", 3, 5, true);
+  char expected2[] = COLOR_RESET COLOR_REVERSE
+      "foo" COLOR_RED "bar" COLOR_DEFAULT "baz" COLOR_RESET CLEAR_LINE "\r\n";
+  char *result2 = highlight_line("foobarbaz", 3, 6, true, true);
   test_assert(strcmp(expected2, result2) == 0);
+  char expected3[] = COLOR_RESET "foobarbaz" CLEAR_LINE "\r\n";
   free(result2);
+  char *result3 = highlight_line("foobarbaz", 0, 0, false, false);
+  test_assert(strcmp(expected3, result3) == 0);
+  free(result3);
 }
 
 void test_expand_tabs() {
