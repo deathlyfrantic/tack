@@ -17,9 +17,7 @@ static List *get_lines_from_stdin() {
   char c;
   List *lines = list_new_of_size(100);
   bool keep_going = true;
-
   flockfile(stdin);
-
   do {
     switch ((c = getchar_unlocked())) {
     case EOF:
@@ -27,21 +25,18 @@ static List *get_lines_from_stdin() {
       if (strcmp(line, "") == 0) {
         break;
       }
-
     case '\n':
       line[cursor] = '\0';
       cursor = 0;
       list_push(lines, strdup(line));
       memset(line, 0, sizeof(char) * BUFSIZ);
       break;
-
     default:
       line[cursor] = c;
       cursor++;
       break;
     }
   } while (keep_going);
-
   funlockfile(stdin);
   return lines;
 }
