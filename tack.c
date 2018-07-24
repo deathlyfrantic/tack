@@ -1,9 +1,15 @@
 #include "list.h"
+#include "render.h"
 #include "score.h"
 #include "tack.h"
+#include "tty.h"
+#include "util.h"
+#include <ctype.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 static List *get_lines_from_stdin() {
   char line[BUFSIZ];
@@ -40,42 +46,118 @@ static List *get_lines_from_stdin() {
   return lines;
 }
 
-static bool filter_out_null_scores(const void *score) { return score != NULL; }
-
-static void *map_score(void *line) {
-  return (void *)calculate_score((char *)line, "foobar");
+static bool run_main_loop(List *stdin_lines) {
+  bool killed = false;
+  char query[BUFSIZ];
+  memset(query, 0, BUFSIZ);
+  size_t cursor = 0;
+  size_t selected = 0;
+  TTY *tty = tty_new();
+  Renderer *renderer = renderer_new();
+  renderer->match_length = get_num_strlen(stdin_lines->length);
+  renderer->height = MIN(15, tty->rows - 1);
+  Score *score;
+  char c;
+  bool need_new_scores = true;
+  List *scores;
+  while (true) {
+    if (need_new_scores) {
+      scores = list_new_of_size(100);
+      for (size_t i = 0; i < stdin_lines->length; i++) {
+        score = calculate_score(stdin_lines->items[i], query);
+        if (score != NULL) {
+          list_push(scores, score);
+        }
+      }
+      list_sort_by_score(scores);
+    }
+    need_new_scores = false;
+    selected = MIN(selected, scores->length - 1);
+    renderer->query = query;
+    renderer->selected = selected;
+    renderer->scores = scores;
+    char *output = renderer_render(renderer);
+    tty_write(tty, output);
+    free(output);
+    switch ((c = tty_read_char(tty))) {
+    case CTRL_KEY('c'):
+      killed = true;
+      goto exit;
+    case CTRL_KEY('n'):
+      if (selected < renderer->height - 2) {
+        selected++;
+      }
+      break;
+    case CTRL_KEY('p'):
+      if (selected > 0) {
+        selected--;
+      }
+      break;
+    case CTRL_KEY('w'): {
+      bool seen_char = false;
+      while (true) {
+        if (cursor == 0 || !isspace(query[cursor - 1])) {
+          seen_char = true;
+        }
+        query[cursor] = '\0';
+        if (cursor == 0 || (isspace(query[cursor - 1]) && seen_char)) {
+          need_new_scores = true;
+          break;
+        }
+        cursor--;
+      }
+      break;
+    }
+    case CTRL_KEY('u'):
+      memset(query, 0, sizeof(char) * BUFSIZ);
+      cursor = 0;
+      need_new_scores = true;
+      break;
+    case 127: // backspace
+      if (cursor > 0) {
+        query[--cursor] = '\0';
+        need_new_scores = true;
+      }
+      break;
+    case '\r': // enter
+      score = scores->items[selected];
+      puts(score->line);
+      goto exit;
+    default:
+      if (isprint(c)) {
+        query[cursor++] = c;
+        query[cursor] = '\0';
+        need_new_scores = true;
+      }
+      break;
+    }
+    if (need_new_scores) {
+      for (size_t i = 0; i < scores->length; i++) {
+        free(scores->items[i]);
+      }
+      list_free(scores);
+    }
+  }
+exit:
+  tty_write(tty, "\r");
+  for (size_t i = 0; i < renderer->height; i++) {
+    tty_write(tty, COLOR_RESET CLEAR_LINE "\r\n");
+  }
+  tty_teardown_and_free(tty);
+  free(renderer);
+  return killed;
 }
 
 int main(int argc, char *argv[]) {
   List *lines = get_lines_from_stdin();
-  // for (size_t i = 0; i < lines->length; i++) {
-  //   printf("line %zd: %s\n", i, lines->items[i]);
-  // }
-  printf("lines read: %zd\n", lines->length);
-
-  List *scores = list_new_of_size(100);
-  Score *score;
+  bool killed = run_main_loop(lines);
   for (size_t i = 0; i < lines->length; i++) {
-    score = calculate_score(lines->items[i], "foobar");
-    if (score != NULL) {
-      list_push(scores, score);
-    }
+    free(lines->items[i]);
   }
-  // Scores *scores =
-  //     list_filter(list_map(lines, map_score), filter_out_null_scores);
-
-  printf("lines matched \"foobar\": %zd\n", scores->length);
-  // Score *score;
-  // for (size_t i = 0; i < scores->length; i++) {
-  //   score = scores->items[i];
-  //   for (size_t j = 0; j < strlen(score->line); j++) {
-  //     if (score->first == j || score->last == j - 1) {
-  //       printf(" <|> ");
-  //     }
-  //     printf("%c", score->line[j]);
-  //   }
-  //   printf("\n");
-  // }
   free(lines);
+  if (killed) {
+    killpg(getpgrp(), SIGINT);
+    return EXIT_FAILURE;
+  }
   return EXIT_SUCCESS;
 }
