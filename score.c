@@ -32,7 +32,7 @@ static bool single_char_query(Score *score, const char *query) {
   bool rv = false;
   if ((idx = find_char_idx(line, tolower(query[0]))) != -1) {
     score->first = idx;
-    score->last = idx;
+    score->last = idx + 1;
     score->points = 1;
     rv = true;
   }
@@ -62,9 +62,9 @@ static bool find_end_of_match(struct match *m, const char *line,
       }
     } else {
       last_match_type = MATCH_TYPE_NORMAL;
-      score += index - last_index;
+      score += index - last_index + 1;
     }
-    last_index = index;
+    last_index = index + 1;
   }
   m->score = score;
   m->last = last_index;
