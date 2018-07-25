@@ -14,7 +14,7 @@ void _test_assertion(const char *assertion, bool passed, const char *file,
   result->func = func;
   result->passed = passed;
   result->assertion = assertion;
-  printf("%c", passed ? '.' : 'F');
+  printf(passed ? "." : "F");
   list_push(results, result);
 }
 
