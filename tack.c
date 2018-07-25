@@ -40,6 +40,13 @@ static List *get_lines_from_stdin() {
   return lines;
 }
 
+static void free_scores(List *scores) {
+  for (size_t i = 0; i < scores->length; i++) {
+    free(scores->items[i]);
+  }
+  free(scores);
+}
+
 static bool run_main_loop(List *stdin_lines) {
   bool killed = false;
   char query[BUFSIZ];
@@ -114,8 +121,6 @@ static bool run_main_loop(List *stdin_lines) {
       }
       break;
     case '\r': // enter
-      score = scores->items[selected];
-      puts(score->line);
       goto exit;
     default:
       if (isprint(c)) {
@@ -126,10 +131,7 @@ static bool run_main_loop(List *stdin_lines) {
       break;
     }
     if (need_new_scores) {
-      for (size_t i = 0; i < scores->length; i++) {
-        free(scores->items[i]);
-      }
-      list_free(scores);
+      free_scores(scores);
     }
   }
 exit:
@@ -138,6 +140,11 @@ exit:
     tty_write(tty, COLOR_RESET CLEAR_LINE "\r\n");
   }
   tty_teardown_and_free(tty);
+  if (!killed) {
+    score = scores->items[selected];
+    puts(score->line);
+  }
+  free_scores(scores);
   free(renderer);
   return killed;
 }
