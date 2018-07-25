@@ -23,9 +23,8 @@ static bool filter_successes(const void *_result) {
   return result->passed;
 }
 
-static bool filter_failures(const void *_result) {
-  TestResult *result = (TestResult *)_result;
-  return !result->passed;
+static bool filter_failures(const void *result) {
+  return !filter_successes(result);
 }
 
 int main(int argc, char *argv[]) {
