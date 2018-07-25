@@ -25,6 +25,7 @@ static List *get_lines_from_stdin() {
       if (strcmp(line, "") == 0) {
         break;
       }
+      // possible fallthrough here is intentional
     case '\n':
       line[cursor] = '\0';
       cursor = 0;
@@ -135,12 +136,14 @@ static bool run_main_loop(List *stdin_lines) {
     }
   }
 exit:
+  // clear all extant output
   tty_write(tty, "\r");
   for (size_t i = 0; i < renderer->height; i++) {
     tty_write(tty, COLOR_RESET CLEAR_LINE "\r\n");
   }
   tty_teardown_and_free(tty);
   if (!killed) {
+    // write selected line to stdout
     score = scores->items[selected];
     puts(score->line);
   }
@@ -157,6 +160,7 @@ int main(int argc, char *argv[]) {
   }
   free(lines);
   if (killed) {
+    // kill all processes in the chain if cancelled
     killpg(getpgrp(), SIGINT);
     return EXIT_FAILURE;
   }
