@@ -19,7 +19,7 @@ static List *get_lines_from_stdin() {
   bool keep_going = true;
   flockfile(stdin);
   do {
-    switch ((c = getchar_unlocked())) {
+    switch ((c = getc_unlocked(stdin))) {
     case EOF:
       keep_going = false;
       if (strcmp(line, "") == 0) {
