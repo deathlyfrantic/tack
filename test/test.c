@@ -29,12 +29,11 @@ static bool filter_failures(const void *result) {
 
 int main(int argc, char *argv[]) {
   results = list_new();
-  puts("Starting tests.");
+  puts("Starting tests.\n");
   run_all_tests();
   List *successes = list_filter(results, filter_successes);
   List *failures = list_filter(results, filter_failures);
-  puts("\n");
-  printf("Total tests: %zd, passed: %zd, failed: %zd\n", results->length,
+  printf("\n\nTotal tests: %zd, passed: %zd, failed: %zd\n", results->length,
          successes->length, failures->length);
   int exit_code = EXIT_SUCCESS;
   TestResult *r;
