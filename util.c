@@ -21,7 +21,8 @@ unsigned int find_char_idx(const char *s, char c) {
 }
 
 unsigned short get_num_strlen(size_t num) {
-  char buf[USHRT_MAX] = {0};
+  char buf[USHRT_MAX];
+  memset(buf, 0, USHRT_MAX);
   sprintf(buf, "%zd", num);
   return strlen(buf);
 }
