@@ -32,8 +32,7 @@ static List *get_lines_from_stdin() {
       memset(line, 0, sizeof(char) * BUFSIZ);
       break;
     default:
-      line[cursor] = c;
-      cursor++;
+      line[cursor++] = c;
       break;
     }
   } while (keep_going);
