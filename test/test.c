@@ -12,14 +12,9 @@ void _test_assertion(const char *assertion, bool passed, const char *file,
   result->line = line;
   result->file = file;
   result->func = func;
+  result->passed = passed;
   result->assertion = assertion;
-  if (passed) {
-    printf(".");
-    result->passed = true;
-  } else {
-    printf("F");
-    result->passed = false;
-  }
+  printf("%c", passed ? '.' : 'F');
   list_push(results, result);
 }
 
