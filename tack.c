@@ -83,6 +83,8 @@ static bool run_main_loop(List *stdin_lines) {
     switch ((c = tty_read_char(tty))) {
     case CTRL_KEY('c'):
       killed = true;
+      // intentional fallthrough
+    case '\r': // enter
       goto exit;
     case CTRL_KEY('n'):
       if (selected < renderer->height - 2) {
@@ -120,8 +122,6 @@ static bool run_main_loop(List *stdin_lines) {
         need_new_scores = true;
       }
       break;
-    case '\r': // enter
-      goto exit;
     default:
       if (isprint(c)) {
         query[cursor++] = c;
