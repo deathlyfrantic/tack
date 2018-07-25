@@ -12,8 +12,7 @@ char *highlight_line(const char *s, size_t beg, size_t end, bool selected,
                   strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
                              COLOR_RESET CLEAR_LINE) +
                   3; // + 2 for \r\n, + 1 for \0
-  char *rv = malloc(sizeof(char) * length);
-  memset(rv, 0, length);
+  char *rv = calloc(length, sizeof(char));
   size_t cursor = strlen(COLOR_RESET);
   sprintf(rv, "%s", COLOR_RESET);
   if (selected) {
@@ -49,7 +48,7 @@ char *expand_tabs(const char *s) {
   for (size_t i = 0; i < strlen(s); i++) {
     length += (s[i] == '\t') ? 8 : 1;
   }
-  char *rv = malloc(sizeof(char) * length);
+  char *rv = calloc(length, sizeof(char));
   size_t cursor = 0;
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == '\t') {
@@ -70,7 +69,7 @@ Renderer *renderer_new() {
 }
 
 char *renderer_render(Renderer *r) {
-  char *rv = malloc(sizeof(char) * 16384); // adjust this later?
+  char *rv = calloc(16384, sizeof(char)); // adjust this later?
   sprintf(rv, "%s\r\n", HIDE_CURSOR);
   Score *score;
   const bool has_query = strlen(r->query) > 0;
