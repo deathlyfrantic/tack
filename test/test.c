@@ -4,44 +4,60 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-List *failures;
-size_t num_tests;
+List *results;
 
 void _test_assertion(const char *assertion, bool passed, const char *file,
                      int line, const char *func) {
-  num_tests++;
+  TestResult *result = malloc(sizeof(TestResult));
+  result->line = line;
+  result->file = file;
+  result->func = func;
+  result->assertion = assertion;
   if (passed) {
     printf(".");
+    result->passed = true;
   } else {
     printf("F");
-    TestFailure *failure = malloc(sizeof(TestFailure));
-    failure->assertion = assertion;
-    failure->line = line;
-    failure->file = file;
-    failure->func = func;
-    list_push(failures, failure);
+    result->passed = false;
   }
+  list_push(results, result);
+}
+
+static bool filter_successes(const void *_result) {
+  TestResult *result = (TestResult *)_result;
+  return result->passed;
+}
+
+static bool filter_failures(const void *_result) {
+  TestResult *result = (TestResult *)_result;
+  return !result->passed;
 }
 
 int main(int argc, char *argv[]) {
-  num_tests = 0;
-  failures = list_new();
-  printf("Starting tests.\n");
+  results = list_new();
+  puts("Starting tests.");
   run_all_tests();
-  printf("\n\n");
-  printf("Total tests: %zd, passed: %zd, failed: %zd\n", num_tests,
-         num_tests - failures->length, failures->length);
+  List *successes = list_filter(results, filter_successes);
+  List *failures = list_filter(results, filter_failures);
+  puts("\n");
+  printf("Total tests: %zd, passed: %zd, failed: %zd\n", results->length,
+         successes->length, failures->length);
+  int exit_code = EXIT_SUCCESS;
+  TestResult *r;
   if (failures->length > 0) {
-    printf("\n"
-           "FAILURES:\n"
-           "--------\n");
+    puts("\nFAILURES:\n---------");
     for (size_t i = 0; i < failures->length; i++) {
-      TestFailure *failure = failures->items[i];
-      printf("[%s:%d:%s()] - \"%s\"\n", failure->file, failure->line,
-             failure->func, failure->assertion);
+      r = failures->items[i];
+      printf("[%s:%d:%s()] - \"%s\"\n", r->file, r->line, r->func,
+             r->assertion);
     }
-    printf("\n");
-    return EXIT_FAILURE;
+    puts("");
+    exit_code = EXIT_FAILURE;
   }
-  return EXIT_SUCCESS;
+  for (size_t i = 0; i < results->length; i++) {
+    r = results->items[i];
+    free(r);
+  }
+  list_free(results);
+  return exit_code;
 }
