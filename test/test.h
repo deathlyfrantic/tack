@@ -9,7 +9,8 @@ typedef struct {
   const char *file;
   const char *func;
   int line;
-} TestFailure;
+  bool passed;
+} TestResult;
 
 #define test_assert(a)                                                         \
   _test_assertion(#a, a,                                                       \
