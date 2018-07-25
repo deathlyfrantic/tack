@@ -53,6 +53,8 @@ int main(int argc, char *argv[]) {
     r = results->items[i];
     free(r);
   }
+  list_free(successes);
+  list_free(failures);
   list_free(results);
   return exit_code;
 }
