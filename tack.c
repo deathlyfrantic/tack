@@ -137,9 +137,8 @@ static bool run_main_loop(List *stdin_lines) {
   }
 exit:
   // clear all extant output
-  tty_write(tty, "\r");
   for (size_t i = 0; i < renderer->height; i++) {
-    tty_write(tty, COLOR_RESET CLEAR_LINE "\r\n");
+    tty_write(tty, COLOR_RESET CLEAR_WHOLE_LINE "\r\n");
   }
   tty_teardown_and_free(tty);
   if (!killed) {
