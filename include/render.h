@@ -37,8 +37,7 @@ typedef struct {
   unsigned short selected;
 } Renderer;
 
-char *highlight_line(const char *, size_t, size_t, bool, bool);
-char *expand_tabs(const char *);
+char *render_line(const char *, size_t, size_t, bool, bool);
 Renderer *renderer_new();
 char *renderer_render(Renderer *);
 

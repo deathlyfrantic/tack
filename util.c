@@ -26,3 +26,13 @@ unsigned short get_num_strlen(size_t num) {
   sprintf(buf, "%zd", num);
   return strlen(buf);
 }
+
+size_t count_chars_in_string(const char *s, char c) {
+  size_t rv = 0;
+  for (size_t i = 0; i < strlen(s); i++) {
+    if (s[i] == c) {
+      rv++;
+    }
+  }
+  return rv;
+}
