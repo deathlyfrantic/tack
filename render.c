@@ -8,7 +8,7 @@
 
 char *render_line(const char *s, size_t beg, size_t end, bool selected,
                   bool has_query) {
-  size_t strlen_s = strlen(s);
+  const size_t strlen_s = strlen(s);
   size_t length = strlen_s + (count_chars_in_string(s, '\t') * 8) +
                   strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
                              COLOR_RESET CLEAR_LINE) +
