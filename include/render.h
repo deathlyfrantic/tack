@@ -2,6 +2,7 @@
 #define TACK_RENDER_H
 
 #include "list.h"
+#include "score.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -36,9 +37,10 @@ typedef struct {
   unsigned short height;
   unsigned short width;
   unsigned short selected;
+  bool has_query;
 } Renderer;
 
-char *render_line(const char *, size_t, size_t, bool, bool, size_t);
+char *render_line(Renderer *, Score *, bool);
 Renderer *renderer_new();
 char *renderer_render(Renderer *);
 
