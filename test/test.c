@@ -14,8 +14,8 @@ void _test_assertion(const char *assertion, bool passed, const char *file,
   result->func = func;
   result->passed = passed;
   result->assertion = assertion;
-  printf(passed ? "." : "F");
   list_push(results, result);
+  printf(passed ? "." : "F");
 }
 
 static bool filter_successes(const void *_result) {
