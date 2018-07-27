@@ -91,11 +91,15 @@ static bool run_main_loop(List *stdin_lines) {
     case CTRL_KEY('n'):
       if (selected < renderer->height - 2) {
         selected++;
+      } else {
+        selected = 0;
       }
       break;
     case CTRL_KEY('p'):
       if (selected > 0) {
         selected--;
+      } else {
+        selected = renderer->height - 2;
       }
       break;
     case CTRL_KEY('w'): {
