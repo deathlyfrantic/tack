@@ -58,6 +58,7 @@ static bool run_main_loop(List *stdin_lines) {
   Renderer *renderer = renderer_new();
   renderer->match_length = get_num_strlen(stdin_lines->length);
   renderer->height = MIN(15, tty->rows - 1);
+  renderer->width = tty->columns;
   Score *score;
   char c;
   bool need_new_scores = true;

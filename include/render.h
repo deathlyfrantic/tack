@@ -34,10 +34,11 @@ typedef struct {
   const char *query;
   unsigned short match_length;
   unsigned short height;
+  unsigned short width;
   unsigned short selected;
 } Renderer;
 
-char *render_line(const char *, size_t, size_t, bool, bool);
+char *render_line(const char *, size_t, size_t, bool, bool, size_t);
 Renderer *renderer_new();
 char *renderer_render(Renderer *);
 
