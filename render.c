@@ -7,7 +7,7 @@
 #include <string.h>
 
 char *render_line(const char *s, size_t beg, size_t end, bool selected,
-                  bool has_query) {
+                  bool has_query, size_t trunc_at) {
   const size_t strlen_s = strlen(s);
   size_t length = strlen_s + (count_chars_in_string(s, '\t') * 8) +
                   strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
@@ -35,10 +35,13 @@ char *render_line(const char *s, size_t beg, size_t end, bool selected,
       do {
         rv[cursor++] = ' ';
         visible_chars++;
-      } while (visible_chars % 8 != 0);
-    } else {
+      } while (trunc_at > visible_chars && visible_chars % 8 != 0);
+    } else if (trunc_at > visible_chars) {
       rv[cursor++] = s[i];
       visible_chars++;
+    }
+    if (trunc_at <= visible_chars) {
+      break;
     }
   }
   if (selected) {
@@ -62,7 +65,7 @@ char *renderer_render(Renderer *r) {
     if (r->scores->length > i) {
       score = r->scores->items[i];
       char *line = render_line(score->line, score->first, score->last,
-                               r->selected == i, has_query);
+                               r->selected == i, has_query, r->width);
       strcat(rv, line);
       free(line);
     } else {
@@ -73,12 +76,11 @@ char *renderer_render(Renderer *r) {
   memset(clear, 0, 10);
   sprintf(clear, "\e[%zdA", (size_t)r->height);
   strcat(rv, clear);
-  size_t length =
-      strlen(r->query) + strlen(" > " SHOW_CURSOR CLEAR_LINE) + r->match_length;
-  char prompt[length];
-  memset(prompt, 0, length);
-  sprintf(prompt, "%*zd > %s%s%s", r->match_length, r->scores->length, r->query,
-          SHOW_CURSOR, CLEAR_LINE);
+  char prompt[r->width];
+  memset(prompt, 0, r->width);
+  snprintf(prompt, r->width, "%*zd > %s", r->match_length, r->scores->length,
+           r->query);
   strcat(rv, prompt);
+  strcat(rv, SHOW_CURSOR CLEAR_LINE);
   return rv;
 }
