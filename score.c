@@ -96,23 +96,19 @@ static bool regular_query(Score *score, const char *_query) {
 Score *calculate_score(const char *line, const char *query) {
   Score *score = score_new();
   score->line = line;
-
   switch (strlen(query)) {
   case 0:
     return score;
-
   case 1:
     if (single_char_query(score, query)) {
       return score;
     }
     break;
-
   default:
     if (regular_query(score, query)) {
       return score;
     }
   }
-
   free(score);
   return NULL;
 }
