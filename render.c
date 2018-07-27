@@ -21,7 +21,7 @@ char *render_line(Renderer *renderer, Score *score, bool selected) {
     cursor += strlen(COLOR_REVERSE);
   }
   for (size_t i = 0; i < strlen_line; i++) {
-    if (renderer->has_query) {
+    if (score->first != score->last) {
       if (score->first == i) {
         strcat(rv, COLOR_RED);
         cursor += strlen(COLOR_RED);
@@ -52,7 +52,6 @@ char *render_line(Renderer *renderer, Score *score, bool selected) {
 
 Renderer *renderer_new() {
   Renderer *r = calloc(1, sizeof(Renderer));
-  r->has_query = false;
   return r;
 }
 
@@ -60,7 +59,6 @@ char *renderer_render(Renderer *r) {
   char *rv = calloc(16384, sizeof(char)); // adjust this later?
   strcat(rv, HIDE_CURSOR "\r\n");
   Score *score;
-  r->has_query = strlen(r->query) > 0; // micro-optimization
   for (size_t i = 0; i < r->height - 1; i++) {
     if (r->scores->length > i) {
       score = r->scores->items[i];

@@ -10,7 +10,6 @@
 void test_render_line() {
   Renderer *r = renderer_new();
   r->width = 200;
-  r->has_query = true;
   Score *s = score_new();
   s->first = 4;
   s->last = 7;
@@ -40,7 +39,8 @@ void test_render_line() {
   free(score);
   free(result3);
   // test no highlighting when no query
-  r->has_query = false;
+  s->first = 0;
+  s->last = 0;
   char expected4[] = COLOR_RESET "foobarbaz" CLEAR_LINE "\r\n";
   char *result4 = render_line(r, s, false);
   test_assert(strcmp(expected4, result4) == 0);
@@ -60,7 +60,8 @@ void test_render_line() {
   // test line truncation with highlighting
   s->line = "foobarbazquuxgarply";
   r->width = 8;
-  r->has_query = true;
+  s->first = 3;
+  s->last = 6;
   char expected7[] =
       COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "ba" CLEAR_LINE "\r\n";
   char *result7 = render_line(r, s, false);

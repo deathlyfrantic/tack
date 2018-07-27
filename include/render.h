@@ -37,7 +37,6 @@ typedef struct {
   unsigned short height;
   unsigned short width;
   unsigned short selected;
-  bool has_query;
 } Renderer;
 
 char *render_line(Renderer *, Score *, bool);
