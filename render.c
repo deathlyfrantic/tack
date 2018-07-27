@@ -52,7 +52,7 @@ char *render_line(const char *s, size_t beg, size_t end, bool selected,
 }
 
 Renderer *renderer_new() {
-  Renderer *r = malloc(sizeof(Renderer));
+  Renderer *r = calloc(1, sizeof(Renderer));
   return r;
 }
 
