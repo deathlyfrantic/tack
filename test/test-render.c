@@ -55,28 +55,3 @@ void test_render_line() {
   test_assert(strcmp(expected9, result9) == 0);
   free(result9);
 }
-
-void test_renderer_render() {
-  char query[] = "fo";
-  Score *a = calculate_score("floof", query);
-  Score *b = calculate_score("ffbboar", query);
-  Score *c = calculate_score("fbarolyo", query);
-  List *scores = list_new_of_size(3);
-  list_push(scores, a);
-  list_push(scores, b);
-  list_push(scores, c);
-  Renderer *r = renderer_new();
-  r->scores = scores;
-  r->query = query;
-  r->height = 15;
-  r->selected = 1;
-  r->match_length = get_num_strlen(scores->length);
-  // char *output = renderer_render(r);
-  // puts(output);
-  // free(output);
-  free(a);
-  free(b);
-  free(c);
-  list_free(scores);
-  free(r);
-}
