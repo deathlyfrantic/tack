@@ -6,10 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *render_line(const char *s, size_t beg, size_t end, bool selected,
-                  bool has_query, size_t trunc_at) {
-  const size_t strlen_s = strlen(s);
-  size_t length = strlen_s + (count_chars_in_string(s, '\t') * 8) +
+char *render_line(Renderer *renderer, Score *score, bool selected) {
+  const size_t strlen_line = strlen(score->line);
+  size_t length = strlen_line + (count_chars_in_string(score->line, '\t') * 8) +
                   strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
                              COLOR_RESET CLEAR_LINE) +
                   3; // + 2 for \r\n, + 1 for \0
@@ -21,26 +20,26 @@ char *render_line(const char *s, size_t beg, size_t end, bool selected,
     strcat(rv, COLOR_REVERSE);
     cursor += strlen(COLOR_REVERSE);
   }
-  for (size_t i = 0; i < strlen_s; i++) {
-    if (has_query) {
-      if (beg == i) {
+  for (size_t i = 0; i < strlen_line; i++) {
+    if (renderer->has_query) {
+      if (score->first == i) {
         strcat(rv, COLOR_RED);
         cursor += strlen(COLOR_RED);
-      } else if (end == i) {
+      } else if (score->last == i) {
         strcat(rv, COLOR_DEFAULT);
         cursor += strlen(COLOR_DEFAULT);
       }
     }
-    if (s[i] == '\t') {
+    if (score->line[i] == '\t') {
       do {
         rv[cursor++] = ' ';
         visible_chars++;
-      } while (trunc_at > visible_chars && visible_chars % 8 != 0);
-    } else if (trunc_at > visible_chars) {
-      rv[cursor++] = s[i];
+      } while (renderer->width > visible_chars && visible_chars % 8 != 0);
+    } else if (renderer->width > visible_chars) {
+      rv[cursor++] = score->line[i];
       visible_chars++;
     }
-    if (trunc_at <= visible_chars) {
+    if (renderer->width <= visible_chars) {
       break;
     }
   }
@@ -53,6 +52,7 @@ char *render_line(const char *s, size_t beg, size_t end, bool selected,
 
 Renderer *renderer_new() {
   Renderer *r = calloc(1, sizeof(Renderer));
+  r->has_query = false;
   return r;
 }
 
@@ -60,12 +60,11 @@ char *renderer_render(Renderer *r) {
   char *rv = calloc(16384, sizeof(char)); // adjust this later?
   strcat(rv, HIDE_CURSOR "\r\n");
   Score *score;
-  const bool has_query = strlen(r->query) > 0;
+  r->has_query = strlen(r->query) > 0; // micro-optimization
   for (size_t i = 0; i < r->height - 1; i++) {
     if (r->scores->length > i) {
       score = r->scores->items[i];
-      char *line = render_line(score->line, score->first, score->last,
-                               r->selected == i, has_query, r->width);
+      char *line = render_line(r, score, r->selected == i);
       strcat(rv, line);
       free(line);
     } else {
