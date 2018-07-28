@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
 default_target:
-	cc -Iinclude/ $(wildcard *.c) -o tack
+	cc -Iinclude/ $(wildcard src/*.c) -o tack
 
 .PHONY: test
 test: clean

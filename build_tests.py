@@ -34,7 +34,7 @@ def make_c_file(test_functions):
 
 
 def create_compile_command(test_files):
-    cfiles = [f.replace('test/test-', '') for f in test_files]
+    cfiles = [f.replace('test/test-', 'src/') for f in test_files]
     files = ' '.join(list(test_files) + cfiles +
                      ['test/__tests.c', 'test/test.c'])
     includes = ' '.join(f'-I{i}/' for i in INCLUDE_PATHS)
