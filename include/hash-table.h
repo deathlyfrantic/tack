@@ -17,5 +17,6 @@ HashTable *hashtable_new();
 void hashtable_set(HashTable *, const void *, void *);
 void *hashtable_get(HashTable *, const void *);
 void hashtable_free(HashTable *);
+void hashtable_free_items(HashTable *, void (*)(void *));
 
 #endif /* end of include guard: TACK_HASH_TABLE_H */

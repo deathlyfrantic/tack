@@ -59,14 +59,26 @@ void *hashtable_get(HashTable *h, const void *key) {
 }
 
 void hashtable_free(HashTable *h) {
-  HashTableEntry *entry = NULL;
+  HashTableEntry *entry = NULL, *next = NULL;
   for (size_t i = 0; i < h->size; i++) {
     entry = h->buckets[i];
     while (entry != NULL) {
-      free(entry->item);
-      entry = entry->next;
+      next = entry->next;
+      free(entry);
+      entry = next;
     }
   }
   free(h->buckets);
   free(h);
+}
+
+void hashtable_free_items(HashTable *h, void (*free_function)(void *)) {
+  HashTableEntry *entry = NULL;
+  for (size_t i = 0; i < h->size; i++) {
+    entry = h->buckets[i];
+    while (entry != NULL) {
+      free_function(entry->item);
+      entry = entry->next;
+    }
+  }
 }
