@@ -1,3 +1,4 @@
+#include "hash-table.h"
 #include "list.h"
 #include "render.h"
 #include "score.h"
@@ -41,14 +42,45 @@ static List *get_lines_from_stdin() {
   return lines;
 }
 
-static void free_scores(List *scores) {
+static void free_scores(void *ptr) {
+  List *scores = (List *)ptr;
   for (size_t i = 0; i < scores->length; i++) {
     free(scores->items[i]);
   }
   free(scores);
 }
 
-static bool run_main_loop(List *stdin_lines) {
+static List *find_closest_scores(HashTable *table, const char *query) {
+  List *scores = NULL;
+  size_t strlen_query = strlen(query);
+  char tmp[strlen_query + 1];
+  strcpy(tmp, query);
+  size_t cursor = strlen_query;
+  while (cursor--) {
+    tmp[cursor] = '\0';
+    scores = hashtable_get(table, tmp);
+    if (scores != NULL) {
+      break;
+    }
+  }
+  return scores;
+}
+
+static List *calculate_scores(List *old, const char *query) {
+  List *scores = list_new_of_size(old->length);
+  Score *old_score, *score;
+  for (size_t i = 0; i < old->length; i++) {
+    old_score = old->items[i];
+    score = calculate_score(old_score->line, query);
+    if (score != NULL) {
+      list_push(scores, score);
+    }
+  }
+  list_sort_by_score(scores);
+  return scores;
+}
+
+static bool run_main_loop(List *initial_scores) {
   bool killed = false;
   char query[BUFSIZ];
   memset(query, 0, BUFSIZ);
@@ -56,25 +88,24 @@ static bool run_main_loop(List *stdin_lines) {
   size_t selected = 0;
   TTY *tty = tty_new();
   Renderer *renderer = renderer_new();
-  renderer->match_length = get_num_strlen(stdin_lines->length);
+  renderer->match_length = get_num_strlen(initial_scores->length);
   renderer->height = MIN(15, tty->rows - 1);
   renderer->width = tty->columns;
   Score *score;
   char c;
-  bool need_new_scores = true;
-  List *scores;
+  bool need_new_scores = false;
+  HashTable *table = hashtable_new();
+  hashtable_set(table, "", initial_scores);
+  List *scores = initial_scores;
   while (true) {
     if (need_new_scores) {
-      scores = list_new_of_size(100);
-      for (size_t i = 0; i < stdin_lines->length; i++) {
-        score = calculate_score(stdin_lines->items[i], query);
-        if (score != NULL) {
-          list_push(scores, score);
-        }
+      scores = hashtable_get(table, query);
+      if (scores == NULL) {
+        scores = calculate_scores(find_closest_scores(table, query), query);
+        hashtable_set(table, query, scores);
       }
-      list_sort_by_score(scores);
+      need_new_scores = false;
     }
-    need_new_scores = false;
     selected = MIN(selected, scores->length - 1);
     renderer->query = query;
     renderer->selected = selected;
@@ -136,9 +167,6 @@ static bool run_main_loop(List *stdin_lines) {
       }
       break;
     }
-    if (need_new_scores) {
-      free_scores(scores);
-    }
   }
 exit:
   // clear all extant output
@@ -151,14 +179,21 @@ exit:
     score = scores->items[selected];
     puts(score->line);
   }
-  free_scores(scores);
+  hashtable_free_items(table, free_scores);
+  hashtable_free(table);
   free(renderer);
   return killed;
 }
 
 int main(int argc, char *argv[]) {
   List *lines = get_lines_from_stdin();
-  bool killed = run_main_loop(lines);
+  List *scores = list_new_of_size(lines->length);
+  Score *score;
+  for (size_t i = 0; i < lines->length; i++) {
+    score = calculate_score(lines->items[i], "");
+    list_push(scores, score);
+  }
+  bool killed = run_main_loop(scores);
   for (size_t i = 0; i < lines->length; i++) {
     free(lines->items[i]);
   }
