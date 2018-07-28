@@ -1,5 +1,6 @@
 #include "hash-table.h"
 #include "test.h"
+#include <stdlib.h>
 
 void test_hashtable() {
   // there's no real way to test individual hash table functions so just test
@@ -10,5 +11,6 @@ void test_hashtable() {
   hashtable_set(h, "foo", strdup("baz"));
   test_assert(strcmp(hashtable_get(h, "foo"), "baz") == 0);
   test_assert(hashtable_get(h, "foobar") == NULL);
+  hashtable_free_items(h, free);
   hashtable_free(h);
 }
