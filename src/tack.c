@@ -13,21 +13,20 @@
 #include <string.h>
 #include <unistd.h>
 
-Config *config;
-
-static void config_init() {
-  config = malloc(sizeof(config));
+static Config *config_init() {
+  Config *config = malloc(sizeof(Config));
   config->full_height = false;
   config->height = 21;
   config->initial_search = strdup("");
+  return config;
 }
 
-static void config_free() {
+static void config_free(Config *config) {
   free(config->initial_search);
   free(config);
 }
 
-static bool parse_args(int argc, char *argv[]) {
+static bool parse_args(int argc, char *argv[], Config *config) {
   static struct option longopts[] = {{"height", required_argument, NULL, 'H'},
                                      {"search", required_argument, NULL, 's'},
                                      {"version", no_argument, NULL, 'v'},
@@ -136,7 +135,7 @@ static List *calculate_scores(List *old, const char *query) {
   return scores;
 }
 
-static bool run_main_loop(List *initial_scores) {
+static bool run_main_loop(List *initial_scores, Config *config) {
   bool killed = false;
   char query[BUFSIZ];
   memset(query, 0, BUFSIZ);
@@ -245,8 +244,8 @@ exit:
 
 int main(int argc, char *argv[]) {
   bool killed = false;
-  config_init();
-  if (parse_args(argc, argv)) {
+  Config *config = config_init();
+  if (parse_args(argc, argv, config)) {
     goto exit;
   }
   List *lines = get_lines_from_stdin();
@@ -256,13 +255,13 @@ int main(int argc, char *argv[]) {
     score = calculate_score(lines->items[i], "");
     list_push(scores, score);
   }
-  killed = run_main_loop(scores);
+  killed = run_main_loop(scores, config);
   for (size_t i = 0; i < lines->length; i++) {
     free(lines->items[i]);
   }
   free(lines);
 exit:
-  config_free();
+  config_free(config);
   if (killed) {
     // kill all processes in the chain if cancelled
     killpg(getpgrp(), SIGINT);
