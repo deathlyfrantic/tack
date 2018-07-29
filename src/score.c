@@ -78,11 +78,11 @@ static bool regular_query(Score *score, const char *_query) {
   char *query = strtolower(_query);
   for (size_t i = 0; i < strlen(line); i++) {
     if (line[i] == query[0]) {
-      if (find_end_of_match(&m, line, query + 1, i)) {
+      if (find_end_of_match(&m, line + 1, query + 1, i)) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
-          score->last = m.last;
+          score->last = m.last + 1;
           score->first = i;
         }
       }
