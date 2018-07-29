@@ -27,7 +27,7 @@ static void config_free() {
   free(config);
 }
 
-static void parse_args(int argc, char *argv[]) {
+static bool parse_args(int argc, char *argv[]) {
   static struct option longopts[] = {{"height", required_argument, NULL, 'H'},
                                      {"search", required_argument, NULL, 's'},
                                      {"version", no_argument, NULL, 'v'},
@@ -57,18 +57,15 @@ static void parse_args(int argc, char *argv[]) {
       config->initial_search = strdup(optarg);
       break;
     case 'v': // fallthrough
+      puts(VERSION);
+      return true;
     case 'h': // fallthrough
     default:
-      if (c == 'v') {
-        puts(VERSION);
-      } else {
-        printf(usage, argv[0]);
-      }
-      config_free();
-      exit(EXIT_SUCCESS);
-      break;
+      printf(usage, argv[0]);
+      return true;
     }
   }
+  return false;
 }
 
 static List *get_lines_from_stdin() {
@@ -247,8 +244,11 @@ exit:
 }
 
 int main(int argc, char *argv[]) {
+  bool killed = false;
   config_init();
-  parse_args(argc, argv);
+  if (parse_args(argc, argv)) {
+    goto exit;
+  }
   List *lines = get_lines_from_stdin();
   List *scores = list_new_of_size(lines->length);
   Score *score;
@@ -256,11 +256,12 @@ int main(int argc, char *argv[]) {
     score = calculate_score(lines->items[i], "");
     list_push(scores, score);
   }
-  bool killed = run_main_loop(scores);
+  killed = run_main_loop(scores);
   for (size_t i = 0; i < lines->length; i++) {
     free(lines->items[i]);
   }
   free(lines);
+exit:
   config_free();
   if (killed) {
     // kill all processes in the chain if cancelled
