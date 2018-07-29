@@ -70,7 +70,7 @@ void list_sort(List *list, int (*cmp)(const void *, const void *)) {
   if (list->length < 2) {
     return;
   }
-  qsort(list->items, list->length, sizeof(list->items[0]), cmp);
+  mergesort(list->items, list->length, sizeof(list->items[0]), cmp);
 }
 
 static int _list_sort_by_score_cmp(const void *_a, const void *_b) {
