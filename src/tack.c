@@ -6,11 +6,70 @@
 #include "tty.h"
 #include "util.h"
 #include <ctype.h>
+#include <getopt.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+Config *config;
+
+static void config_init() {
+  config = malloc(sizeof(config));
+  config->full_height = false;
+  config->height = 21;
+  config->initial_search = strdup("");
+}
+
+static void config_free() {
+  free(config->initial_search);
+  free(config);
+}
+
+static void parse_args(int argc, char *argv[]) {
+  static struct option longopts[] = {{"height", required_argument, NULL, 'H'},
+                                     {"search", required_argument, NULL, 's'},
+                                     {"version", no_argument, NULL, 'v'},
+                                     {"help", no_argument, NULL, 'h'},
+                                     {NULL, 0, NULL, 0}};
+  static const char usage[] =
+      "Usage: %s [options]\n"
+      "  -H, --height <lines>   Specify UI height in lines (including "
+      "prompt).\n"
+      "                         (Use `--height full` for full screen)\n"
+      "  -s, --search <search>  Specify an initial search string\n"
+      "  -h, --help\n"
+      "  -v, --version\n";
+
+  int c;
+  while ((c = getopt_long(argc, argv, "H:s:hv", longopts, NULL)) != -1) {
+    switch (c) {
+    case 'H':
+      if (strcmp(optarg, "full") == 0) {
+        config->full_height = true;
+      } else {
+        config->height = strtol(optarg, NULL, 10);
+      }
+      break;
+    case 's':
+      free(config->initial_search);
+      config->initial_search = strdup(optarg);
+      break;
+    case 'v': // fallthrough
+    case 'h': // fallthrough
+    default:
+      if (c == 'v') {
+        puts(VERSION);
+      } else {
+        printf(usage, argv[0]);
+      }
+      config_free();
+      exit(EXIT_SUCCESS);
+      break;
+    }
+  }
+}
 
 static List *get_lines_from_stdin() {
   char line[BUFSIZ];
@@ -84,16 +143,18 @@ static bool run_main_loop(List *initial_scores) {
   bool killed = false;
   char query[BUFSIZ];
   memset(query, 0, BUFSIZ);
-  size_t cursor = 0;
+  strcat(query, config->initial_search);
+  size_t cursor = strlen(query);
   size_t selected = 0;
   TTY *tty = tty_new();
   Renderer *renderer = renderer_new();
   renderer->match_length = get_num_strlen(initial_scores->length);
-  renderer->height = MIN(15, tty->rows - 1);
+  renderer->height =
+      config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1);
   renderer->width = tty->columns;
   Score *score;
   char c;
-  bool need_new_scores = false;
+  bool need_new_scores = strlen(query) > 0;
   HashTable *table = hashtable_new();
   hashtable_set(table, "", initial_scores);
   List *scores = initial_scores;
@@ -186,6 +247,8 @@ exit:
 }
 
 int main(int argc, char *argv[]) {
+  config_init();
+  parse_args(argc, argv);
   List *lines = get_lines_from_stdin();
   List *scores = list_new_of_size(lines->length);
   Score *score;
@@ -198,6 +261,7 @@ int main(int argc, char *argv[]) {
     free(lines->items[i]);
   }
   free(lines);
+  config_free();
   if (killed) {
     // kill all processes in the chain if cancelled
     killpg(getpgrp(), SIGINT);
