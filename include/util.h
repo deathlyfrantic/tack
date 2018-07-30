@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define MIN(a, b) ((a < b) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 char *strtolower(const char *);
 unsigned int find_char_idx(const char *, char);
