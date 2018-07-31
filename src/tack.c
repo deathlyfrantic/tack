@@ -40,7 +40,6 @@ static bool parse_args(int argc, char *argv[], Config *config) {
       "  -s, --search <search>  Specify an initial search string\n"
       "  -h, --help\n"
       "  -v, --version\n";
-
   int c;
   while ((c = getopt_long(argc, argv, "H:s:hv", longopts, NULL)) != -1) {
     switch (c) {
