@@ -9,7 +9,7 @@ typedef struct {
   char *initial_search;
 } Config;
 
-Config *config_init();
+Config *config_new();
 void config_free(Config *);
 
 #endif /* end of include guard: TACK_CONFIG_H */

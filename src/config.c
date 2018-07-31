@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Config *config_init() {
+Config *config_new() {
   Config *config = malloc(sizeof(Config));
   config->full_height = false;
   config->height = 21;
