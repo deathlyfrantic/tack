@@ -6,12 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *render_line(Renderer *renderer, Score *score, bool selected) {
+char *render_line(Renderer *renderer, Score *score, const bool selected) {
   const size_t strlen_line = strlen(score->line);
-  size_t length = strlen_line + (count_chars_in_string(score->line, '\t') * 8) +
-                  strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
-                             COLOR_RESET CLEAR_LINE) +
-                  3; // + 2 for \r\n, + 1 for \0
+  const size_t length = strlen_line +
+                        (count_chars_in_string(score->line, '\t') * 8) +
+                        strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
+                                   COLOR_RESET CLEAR_LINE) +
+                        3; // + 2 for \r\n, + 1 for \0
   char *rv = calloc(length, sizeof(char));
   size_t cursor = strlen(COLOR_RESET);
   size_t visible_chars = 0;

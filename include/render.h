@@ -39,7 +39,7 @@ typedef struct {
   unsigned short selected;
 } Renderer;
 
-char *render_line(Renderer *, Score *, bool);
+char *render_line(Renderer *, Score *, const bool);
 Renderer *renderer_new();
 char *renderer_render(Renderer *);
 

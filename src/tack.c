@@ -27,11 +27,12 @@ static void config_free(Config *config) {
 }
 
 static bool parse_args(int argc, char *argv[], Config *config) {
-  static struct option longopts[] = {{"height", required_argument, NULL, 'H'},
-                                     {"search", required_argument, NULL, 's'},
-                                     {"version", no_argument, NULL, 'v'},
-                                     {"help", no_argument, NULL, 'h'},
-                                     {NULL, 0, NULL, 0}};
+  static const struct option longopts[] = {
+      {"height", required_argument, NULL, 'H'},
+      {"search", required_argument, NULL, 's'},
+      {"version", no_argument, NULL, 'v'},
+      {"help", no_argument, NULL, 'h'},
+      {NULL, 0, NULL, 0}};
   static const char usage[] =
       "Usage: %s [options]\n"
       "  -H, --height <lines>   Specify UI height in lines (including "
@@ -106,7 +107,7 @@ static void free_scores(void *ptr) {
 
 static List *find_closest_scores(HashTable *table, const char *query) {
   List *scores = NULL;
-  size_t strlen_query = strlen(query);
+  const size_t strlen_query = strlen(query);
   char tmp[strlen_query + 1];
   strcpy(tmp, query);
   size_t cursor = strlen_query;
