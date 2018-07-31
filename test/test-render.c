@@ -22,7 +22,7 @@ void test_render_line() {
   free(result1);
   // test highlighting, reverse for selected line
   char expected2[] = COLOR_RESET COLOR_REVERSE
-      "foo" COLOR_RED "bar" COLOR_DEFAULT "baz" COLOR_RESET CLEAR_LINE "\r\n";
+    "foo" COLOR_RED "bar" COLOR_DEFAULT "baz" COLOR_RESET CLEAR_LINE "\r\n";
   s->first = 3;
   s->last = 6;
   s->line = "foobarbaz";
@@ -31,8 +31,8 @@ void test_render_line() {
   free(result2);
   // test expand tabs, highlighting
   char expected3[] =
-      COLOR_RESET "foo     bar     baz     " COLOR_RED
-                  "quux            gar" COLOR_DEFAULT "ply" CLEAR_LINE "\r\n";
+    COLOR_RESET "foo     bar     baz     " COLOR_RED
+                "quux            gar" COLOR_DEFAULT "ply" CLEAR_LINE "\r\n";
   Score *score = calculate_score("foo\tbar\tbaz\tquux\t\tgarply", "qr");
   char *result3 = render_line(r, score, false);
   test_assert(strcmp(expected3, result3) == 0);
@@ -63,7 +63,7 @@ void test_render_line() {
   s->first = 3;
   s->last = 6;
   char expected7[] =
-      COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "ba" CLEAR_LINE "\r\n";
+    COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "ba" CLEAR_LINE "\r\n";
   char *result7 = render_line(r, s, false);
   test_assert(strcmp(expected7, result7) == 0);
   free(result7);

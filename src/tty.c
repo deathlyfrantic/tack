@@ -43,7 +43,9 @@ void tty_teardown_and_free(TTY *tty) {
   free(tty);
 }
 
-void tty_write(TTY *tty, const char *s) { write(tty->fd, s, strlen(s)); }
+void tty_write(TTY *tty, const char *s) {
+  write(tty->fd, s, strlen(s));
+}
 
 unsigned char tty_read_char(TTY *tty) {
   read(tty->fd, tty->read_buf, 1);

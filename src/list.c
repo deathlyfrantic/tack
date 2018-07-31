@@ -11,7 +11,9 @@ static void list_grow(List *list) {
   list->items = realloc(list->items, sizeof(void *) * list->capacity);
 }
 
-List *list_new() { return list_new_of_size(10); }
+List *list_new() {
+  return list_new_of_size(10);
+}
 
 List *list_new_of_size(size_t size) {
   List *list = malloc(sizeof(List));

@@ -39,7 +39,7 @@ void test_calculate_score() {
   test_assert(score4->last == 10);
   free(score4);
   Score *score5 =
-      calculate_score("f||||||||b||||||||||||||a||||f||||||||r", "bar");
+    calculate_score("f||||||||b||||||||||||||a||||f||||||||r", "bar");
   test_assert(score5->points == 2);
   test_assert(score5->first == 9);
   test_assert(score5->last == 39);
