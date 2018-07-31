@@ -1,3 +1,4 @@
+#include "config.h"
 #include "hash-table.h"
 #include "list.h"
 #include "render.h"
@@ -12,19 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-static Config *config_init() {
-  Config *config = malloc(sizeof(Config));
-  config->full_height = false;
-  config->height = 21;
-  config->initial_search = strdup("");
-  return config;
-}
-
-static void config_free(Config *config) {
-  free(config->initial_search);
-  free(config);
-}
 
 static bool parse_args(int argc, char *argv[], Config *config) {
   static const struct option longopts[] = {
