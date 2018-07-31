@@ -11,7 +11,7 @@ static unsigned int hash_string(const void *_s) {
   char c;
   while ((c = *s++)) {
     // I just made this up, who knows if it's any good
-    hash += (hash + c) << 3;
+    hash += (hash << 3) + c;
   }
   return hash;
 }
