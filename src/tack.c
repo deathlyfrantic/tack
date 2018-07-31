@@ -28,19 +28,20 @@ static void config_free(Config *config) {
 
 static bool parse_args(int argc, char *argv[], Config *config) {
   static const struct option longopts[] = {
-      {"height", required_argument, NULL, 'H'},
-      {"search", required_argument, NULL, 's'},
-      {"version", no_argument, NULL, 'v'},
-      {"help", no_argument, NULL, 'h'},
-      {NULL, 0, NULL, 0}};
+    { "height", required_argument, NULL, 'H' },
+    { "search", required_argument, NULL, 's' },
+    { "version", no_argument, NULL, 'v' },
+    { "help", no_argument, NULL, 'h' },
+    { NULL, 0, NULL, 0 }
+  };
   static const char usage[] =
-      "Usage: %s [options]\n"
-      "  -H, --height <lines>   Specify UI height in lines (including "
-      "prompt).\n"
-      "                         (Use `--height full` for full screen)\n"
-      "  -s, --search <search>  Specify an initial search string\n"
-      "  -h, --help\n"
-      "  -v, --version\n";
+    "Usage: %s [options]\n"
+    "  -H, --height <lines>   Specify UI height in lines (including "
+    "prompt).\n"
+    "                         (Use `--height full` for full screen)\n"
+    "  -s, --search <search>  Specify an initial search string\n"
+    "  -h, --help\n"
+    "  -v, --version\n";
   int c;
   while ((c = getopt_long(argc, argv, "H:s:hv", longopts, NULL)) != -1) {
     switch (c) {
@@ -146,7 +147,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   Renderer *renderer = renderer_new();
   renderer->match_length = get_num_strlen(initial_scores->length);
   renderer->height =
-      config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1);
+    config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1);
   renderer->width = tty->columns;
   Score *score;
   char c;
