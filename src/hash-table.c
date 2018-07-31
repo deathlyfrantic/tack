@@ -25,7 +25,7 @@ HashTable *hashtable_new() {
 }
 
 void hashtable_set(HashTable *h, const void *key, void *value) {
-  unsigned int hash = h->hash(key);
+  const unsigned int hash = h->hash(key);
   size_t bucket = hash % h->size;
   HashTableEntry *entry = h->buckets[bucket], *prev = NULL;
   while (entry != NULL && entry->hash != hash) {
@@ -47,7 +47,7 @@ void hashtable_set(HashTable *h, const void *key, void *value) {
 
 void *hashtable_get(HashTable *h, const void *key) {
   void *rv = NULL;
-  unsigned int hash = h->hash(key);
+  const unsigned int hash = h->hash(key);
   HashTableEntry *entry = h->buckets[hash % h->size];
   while (entry != NULL && entry->hash != hash) {
     entry = entry->next;

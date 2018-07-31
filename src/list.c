@@ -77,8 +77,8 @@ static int _list_sort_by_score_cmp(const void *_a, const void *_b) {
   if (_a == NULL || _b == NULL) {
     return 0;
   }
-  Score *a = *(Score **)_a;
-  Score *b = *(Score **)_b;
+  const Score *a = *(Score **)_a;
+  const Score *b = *(Score **)_b;
   return a->points == b->points ? 0 : a->points > b->points ? 1 : -1;
 }
 
