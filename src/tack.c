@@ -233,7 +233,7 @@ exit:
 
 int main(int argc, char *argv[]) {
   bool killed = false;
-  Config *config = config_init();
+  Config *config = config_new();
   if (parse_args(argc, argv, config)) {
     goto exit;
   }
