@@ -7,6 +7,10 @@
 #include <string.h>
 
 char *render_line(Renderer *renderer, Score *score, const bool selected) {
+  // this function:
+  // - highlights match
+  // - expands tabs
+  // - truncates line to width
   const size_t strlen_line = strlen(score->line);
   const size_t length = strlen_line +
                         (count_chars_in_string(score->line, '\t') * 8) +
@@ -32,6 +36,7 @@ char *render_line(Renderer *renderer, Score *score, const bool selected) {
       }
     }
     if (score->line[i] == '\t') {
+      // expand tabs into spaces (actual tabs break reversed highlighting)
       do {
         rv[cursor++] = ' ';
         visible_chars++;
@@ -41,6 +46,7 @@ char *render_line(Renderer *renderer, Score *score, const bool selected) {
       visible_chars++;
     }
     if (renderer->width <= visible_chars) {
+      // truncate at width of screen
       break;
     }
   }
