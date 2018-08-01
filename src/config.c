@@ -11,6 +11,7 @@ Config *config_new() {
 }
 
 void config_free(Config *config) {
+  if (config == NULL) return;
   free(config->initial_search);
   free(config);
 }

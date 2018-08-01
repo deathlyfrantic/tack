@@ -36,6 +36,7 @@ TTY *tty_new() {
 }
 
 void tty_teardown_and_free(TTY *tty) {
+  if (tty == NULL) return;
   tcsetattr(tty->fd, TCSANOW, tty->original_state);
   close(tty->fd);
   free(tty->read_buf);

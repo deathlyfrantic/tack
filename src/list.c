@@ -25,9 +25,7 @@ List *list_new_of_size(size_t size) {
 }
 
 void list_free(List *list) {
-  if (list == NULL) {
-    return;
-  }
+  if (list == NULL) return;
   free(list->items);
   free(list);
 }

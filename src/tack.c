@@ -87,6 +87,7 @@ static List *get_lines_from_stdin() {
 }
 
 static void free_scores(void *ptr) {
+  if (ptr == NULL) return;
   List *scores = (List *)ptr;
   for (size_t i = 0; i < scores->length; i++) {
     free(scores->items[i]);
