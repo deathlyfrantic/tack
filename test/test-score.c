@@ -44,4 +44,10 @@ void test_calculate_score() {
   test_assert(score5->first == 9);
   test_assert(score5->last == 39);
   free(score5);
+  // test that we get the best score
+  Score *score6 = calculate_score("foofoobar", "foob");
+  test_assert(score6->points = 4);
+  test_assert(score6->first = 3);
+  test_assert(score6->last = 6);
+  free(score6);
 }
