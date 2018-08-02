@@ -58,4 +58,9 @@ void test_get_num_strlen() {
   test_assert(get_num_strlen(50000) == 5);
 }
 
+void test_count_chars_in_string() {
+  test_assert(count_chars_in_string("foobar", 'x') == 0);
+  test_assert(count_chars_in_string("f\tf\t\t\t\tf\t", '\t') == 6);
+}
+
 #endif
