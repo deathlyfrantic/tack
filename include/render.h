@@ -3,8 +3,6 @@
 
 #include "list.h"
 #include "score.h"
-#include <stdbool.h>
-#include <stdlib.h>
 
 // clang-format off
 #define COLOR_DEFAULT      "\e[39m"
@@ -39,7 +37,6 @@ typedef struct {
   unsigned short selected;
 } Renderer;
 
-char *render_line(Renderer *, Score *, const bool);
 Renderer *renderer_new();
 char *renderer_render(Renderer *);
 
