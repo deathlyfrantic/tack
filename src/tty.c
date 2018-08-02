@@ -27,7 +27,7 @@ static void tty_set_state(TTY *tty) {
 
 TTY *tty_new() {
   TTY *tty = malloc(sizeof(TTY));
-  tty->read_buf = calloc(2, sizeof(char));
+  tty->read_buf = calloc(2, sizeof(unsigned char));
   tty->read_buf[1] = '\0';
   tty->fd = open("/dev/tty", O_RDWR);
   tty_set_size(tty);

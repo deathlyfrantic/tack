@@ -1,12 +1,13 @@
 #ifndef TACK_SCORE_H
 #define TACK_SCORE_H
 
+#include <stdint.h>
 #include <stdio.h>
 
 typedef struct {
-  unsigned int points;
-  unsigned int first;
-  unsigned int last;
+  uint16_t points;
+  uint16_t first;
+  uint16_t last;
   const char *line;
 } Score;
 

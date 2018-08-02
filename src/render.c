@@ -1,6 +1,7 @@
 #include "render.h"
 #include "score.h"
 #include "util.h"
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,7 +80,7 @@ char *renderer_render(Renderer *r) {
   }
   char clear[10] = "";
   memset(clear, 0, 10);
-  sprintf(clear, "\e[%zdA", (size_t)r->height);
+  sprintf(clear, "\e[%" PRIu16 "A", r->height);
   strcat(rv, clear);
   char prompt[r->width];
   memset(prompt, 0, r->width);

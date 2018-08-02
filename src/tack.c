@@ -8,6 +8,7 @@
 #include "util.h"
 #include <ctype.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -37,7 +38,7 @@ static bool parse_args(int argc, char *argv[], Config *config) {
       if (strcmp(optarg, "full") == 0) {
         config->full_height = true;
       } else {
-        config->height = strtol(optarg, NULL, 10);
+        sscanf(optarg, "%" SCNu16, &config->height);
       }
       break;
     case 's':
@@ -58,7 +59,7 @@ static bool parse_args(int argc, char *argv[], Config *config) {
 
 static List *get_lines_from_stdin() {
   char line[BUFSIZ];
-  unsigned int cursor = 0;
+  size_t cursor = 0;
   char c;
   List *lines = list_new_of_size(100);
   bool keep_going = true;

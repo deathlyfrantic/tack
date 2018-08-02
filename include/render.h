@@ -3,6 +3,7 @@
 
 #include "list.h"
 #include "score.h"
+#include <stdint.h>
 
 // clang-format off
 #define COLOR_DEFAULT      "\e[39m"
@@ -31,10 +32,10 @@
 typedef struct {
   List *scores;
   const char *query;
-  unsigned short match_length;
-  unsigned short height;
-  unsigned short width;
-  unsigned short selected;
+  uint8_t match_length;
+  uint16_t height;
+  uint16_t width;
+  uint16_t selected;
 } Renderer;
 
 Renderer *renderer_new();

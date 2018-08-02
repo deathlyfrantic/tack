@@ -5,9 +5,9 @@
 
 #define DEFAULT_SIZE 20
 
-static unsigned int hash_string(const void *_s) {
+static uint32_t hash_string(const void *_s) {
   const char *s = _s;
-  unsigned int hash = 0;
+  uint32_t hash = 0;
   char c;
   while ((c = *s++)) {
     // I just made this up, who knows if it's any good
@@ -25,7 +25,7 @@ HashTable *hashtable_new() {
 }
 
 void hashtable_set(HashTable *h, const void *key, void *value) {
-  const unsigned int hash = h->hash(key);
+  const uint32_t hash = h->hash(key);
   size_t bucket = hash % h->size;
   HashTableEntry *entry = h->buckets[bucket], *prev = NULL;
   while (entry != NULL && entry->hash != hash) {
@@ -47,7 +47,7 @@ void hashtable_set(HashTable *h, const void *key, void *value) {
 
 void *hashtable_get(HashTable *h, const void *key) {
   void *rv = NULL;
-  const unsigned int hash = h->hash(key);
+  const uint32_t hash = h->hash(key);
   HashTableEntry *entry = h->buckets[hash % h->size];
   while (entry != NULL && entry->hash != hash) {
     entry = entry->next;

@@ -1,5 +1,6 @@
 #include "list.h"
 #include "test.h"
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
     puts("\nFAILURES:\n---------");
     for (size_t i = 0; i < failures->length; i++) {
       r = failures->items[i];
-      printf("[%s:%d:%s()] - \"%s\"\n", r->file, r->line, r->func,
+      printf("[%s:%" PRIu16 ":%s()] - \"%s\"\n", r->file, r->line, r->func,
              r->assertion);
     }
     puts("");
