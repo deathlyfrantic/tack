@@ -136,8 +136,10 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   TTY *tty = tty_new();
   Renderer *renderer = renderer_new();
   renderer->match_length = get_num_strlen(initial_scores->length);
-  renderer->height =
-    config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1);
+  renderer->height = MIN(
+    config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1),
+    // "clamp" renderer height if there aren't enough input lines to fill it
+    initial_scores->length + 1);
   renderer->width = tty->columns;
   Score *score;
   char c;
