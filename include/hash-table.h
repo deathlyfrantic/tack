@@ -1,16 +1,18 @@
 #ifndef TACK_HASH_TABLE_H
 #define TACK_HASH_TABLE_H
 
+#include <stdint.h>
+
 typedef struct hashtableentry {
   struct hashtableentry *next;
-  unsigned int hash;
+  uint32_t hash;
   void *item;
 } HashTableEntry;
 
 typedef struct {
-  unsigned int (*hash)(const void *);
+  uint32_t (*hash)(const void *);
   HashTableEntry **buckets;
-  unsigned int size;
+  uint8_t size;
 } HashTable;
 
 HashTable *hashtable_new();

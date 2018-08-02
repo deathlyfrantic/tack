@@ -1,14 +1,15 @@
 #include "score.h"
 #include "util.h"
 #include <ctype.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct match {
-  unsigned int score;
-  unsigned int last;
+  uint16_t score;
+  uint16_t last;
 };
 
 enum match_type {
@@ -19,7 +20,7 @@ enum match_type {
 
 Score *score_new() {
   Score *score = malloc(sizeof(Score));
-  score->points = UINT_MAX;
+  score->points = UINT16_MAX;
   score->first = 0;
   score->last = 0;
   score->line = NULL;
@@ -27,7 +28,7 @@ Score *score_new() {
 }
 
 static bool single_char_query(Score *score, const char *query) {
-  unsigned int idx;
+  int16_t idx;
   char *line = strtolower(score->line);
   bool rv = false;
   if ((idx = find_char_idx(line, tolower(query[0]))) != -1) {
@@ -41,9 +42,9 @@ static bool single_char_query(Score *score, const char *query) {
 }
 
 static bool find_end_of_match(struct match *m, const char *line,
-                              const char *query, unsigned int start) {
-  unsigned int last_index = start, index;
-  unsigned int score = 1;
+                              const char *query, size_t start) {
+  uint16_t last_index = start, score = 1;
+  int16_t index;
   enum match_type last_match_type = MATCH_TYPE_NORMAL;
   for (size_t i = 0; i < strlen(query); i++) {
     if ((index = find_char_idx(line + last_index, query[i])) == -1) {
@@ -116,8 +117,9 @@ Score *calculate_score(const char *line, const char *query) {
 void _score_log(const char *name, Score *score) {
   printf("[Score \"%s\" (%p)]", name, score);
   if (score != NULL) {
-    printf(" points %d; first %d; last %d; line \"%s\"", score->points,
-           score->first, score->last, score->line);
+    printf(" points %" PRIu16 "; first %" PRIu16 "; last %" PRIu16
+           "; line \"%s\"",
+           score->points, score->first, score->last, score->line);
   }
   printf("\n");
 }
@@ -127,7 +129,7 @@ void _score_log(const char *name, Score *score) {
 
 void test_score_new() {
   Score *score = score_new();
-  test_assert(score->points == UINT_MAX);
+  test_assert(score->points == UINT16_MAX);
   test_assert(score->first == 0);
   test_assert(score->last == 0);
   test_assert(score->line == NULL);

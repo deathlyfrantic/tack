@@ -1,17 +1,18 @@
 #ifndef TACK_TTY_H
 #define TACK_TTY_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include <termios.h>
 
 #define CTRL_KEY(k) (k & 0x1f)
 
 typedef struct {
-  unsigned short rows;
-  unsigned short columns;
+  uint16_t rows;
+  uint16_t columns;
   int fd;
   struct termios *original_state;
-  char *read_buf;
+  unsigned char *read_buf;
 } TTY;
 
 TTY *tty_new();

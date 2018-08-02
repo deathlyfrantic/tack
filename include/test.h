@@ -2,13 +2,14 @@
 #define TACK_TEST_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 typedef struct {
   const char *assertion;
   const char *file;
   const char *func;
-  int line;
+  uint16_t line;
   bool passed;
 } TestResult;
 

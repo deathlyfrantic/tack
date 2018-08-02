@@ -2,10 +2,11 @@
 #define TACK_CONFIG_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
   bool full_height;
-  unsigned short height;
+  uint16_t height;
   char *initial_search;
 } Config;
 
