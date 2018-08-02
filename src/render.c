@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *render_line(Renderer *renderer, Score *score, const bool selected) {
+static char *render_line(Renderer *renderer, Score *score,
+                         const bool selected) {
   // this function:
   // - highlights match
   // - expands tabs
