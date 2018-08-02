@@ -1,12 +1,12 @@
 SHELL = /bin/sh
 
-default_target:
-	cc -Iinclude/ $(wildcard src/*.c) -o tack
+default_target: clean
+	cc -Iinclude $(shell find src -name '*.c' ! -name 'test.c') -o tack
 
 .PHONY: test
 test: clean
 	exec $(shell python3 build_tests.py)
-	./testrunner
+	./tack_tests
 
 clean:
-	rm -f test/__tests.{c,h} testrunner tack
+	rm -f src/__tests.{c,h} tack_tests tack

@@ -232,6 +232,8 @@ exit:
   return killed;
 }
 
+#ifndef TESTS
+
 int main(int argc, char *argv[]) {
   bool killed = false;
   Config *config = config_new();
@@ -259,3 +261,5 @@ exit:
   }
   return EXIT_SUCCESS;
 }
+
+#endif
