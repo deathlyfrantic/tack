@@ -1,9 +1,9 @@
 #include "config.h"
 #include "hash-table.h"
-#include "line.h"
 #include "list.h"
 #include "render.h"
 #include "score.h"
+#include "tack-string.h"
 #include "tack.h"
 #include "tty.h"
 #include "util.h"
@@ -59,8 +59,7 @@ static bool parse_args(int argc, char *argv[], Config *config) {
 }
 
 static List *get_lines_from_stdin() {
-  char line[BUFSIZ];
-  size_t cursor = 0;
+  String *s = string_new();
   char c;
   List *lines = list_new_of_size(100);
   bool keep_going = true;
@@ -69,20 +68,16 @@ static List *get_lines_from_stdin() {
     switch ((c = getc_unlocked(stdin))) {
     case EOF:
       keep_going = false;
-      if (strcmp(line, "") == 0) {
+      if (strcmp(s->buf, "") == 0) {
         break;
       }
       // possible fallthrough here is intentional
     case '\n':
-      line[cursor] = '\0';
-      cursor = 0;
-      Line *l = line_new();
-      l->original = strdup(line);
-      list_push(lines, l);
-      memset(line, 0, sizeof(char) * BUFSIZ);
+      list_push(lines, s);
+      s = string_new();
       break;
     default:
-      line[cursor++] = c;
+      string_push_char(s, c);
       break;
     }
   } while (keep_going);
@@ -230,7 +225,7 @@ exit:
   if (!killed) {
     // write selected line to stdout
     score = scores->items[selected];
-    puts(score->line->original);
+    puts(score->line->buf);
   }
   hashtable_free_items(table, free_scores);
   hashtable_free(table);
@@ -247,11 +242,6 @@ int main(int argc, char *argv[]) {
     goto exit;
   }
   List *lines = get_lines_from_stdin();
-  Line *line;
-  for (size_t i = 0; i < lines->length; i++) {
-    line = lines->items[i];
-    line->lowered = strtolower(line->original);
-  }
   List *scores = list_new_of_size(lines->length);
   Score *score;
   for (size_t i = 0; i < lines->length; i++) {
@@ -260,7 +250,7 @@ int main(int argc, char *argv[]) {
   }
   killed = run_main_loop(scores, config);
   for (size_t i = 0; i < lines->length; i++) {
-    line_free(lines->items[i]);
+    string_free(lines->items[i]);
   }
   free(lines);
 exit:

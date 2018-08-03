@@ -13,12 +13,11 @@ static char *render_line(Renderer *renderer, Score *score,
   // - highlights match
   // - expands tabs
   // - truncates line to width
-  const size_t strlen_line = strlen(score->line->original);
-  const size_t length =
-    strlen_line + (count_chars_in_string(score->line->original, '\t') * 8) +
-    strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT COLOR_RESET
-             CLEAR_LINE) +
-    3; // + 2 for \r\n, + 1 for \0
+  const size_t length = score->line->length +
+                        (string_count_chars(score->line, '\t') * 8) +
+                        strlen(COLOR_RESET COLOR_REVERSE COLOR_RED COLOR_DEFAULT
+                                 COLOR_RESET CLEAR_LINE) +
+                        3; // + 2 for \r\n, + 1 for \0
   char *rv = calloc(length, sizeof(char));
   size_t cursor = strlen(COLOR_RESET);
   size_t visible_chars = 0;
@@ -27,7 +26,7 @@ static char *render_line(Renderer *renderer, Score *score,
     strcat(rv, COLOR_REVERSE);
     cursor += strlen(COLOR_REVERSE);
   }
-  for (size_t i = 0; i < strlen_line; i++) {
+  for (size_t i = 0; i < score->line->length; i++) {
     if (score->first != score->last) {
       if (score->first == i) {
         strcat(rv, COLOR_RED);
@@ -37,14 +36,14 @@ static char *render_line(Renderer *renderer, Score *score,
         cursor += strlen(COLOR_DEFAULT);
       }
     }
-    if (score->line->original[i] == '\t') {
+    if (score->line->buf[i] == '\t') {
       // expand tabs into spaces (actual tabs break reversed highlighting)
       do {
         rv[cursor++] = ' ';
         visible_chars++;
       } while (renderer->width > visible_chars && visible_chars % 8 != 0);
     } else if (renderer->width > visible_chars) {
-      rv[cursor++] = score->line->original[i];
+      rv[cursor++] = score->line->buf[i];
       visible_chars++;
     }
     if (renderer->width <= visible_chars) {
@@ -97,13 +96,11 @@ char *renderer_render(Renderer *r) {
 void test_render_line() {
   Renderer *r = renderer_new();
   r->width = 200;
-  Line *line = line_new();
+  String *line = string_new_from("foo\tbarbaz");
   Score *s = score_new();
   s->first = 4;
   s->last = 7;
   s->line = line;
-  line->original = "foo\tbarbaz";
-  line->lowered = "foo\tbarbaz";
   // test expand tabs, highlighting
   char expected1[] = COLOR_RESET "foo     " COLOR_RED "bar" COLOR_DEFAULT
                                  "baz" CLEAR_LINE "\r\n";
@@ -115,8 +112,7 @@ void test_render_line() {
     "foo" COLOR_RED "bar" COLOR_DEFAULT "baz" COLOR_RESET CLEAR_LINE "\r\n";
   s->first = 3;
   s->last = 6;
-  line->original = "foobarbaz";
-  line->lowered = "foobarbaz";
+  string_set(line, "foobarbaz");
   char *result2 = render_line(r, s, true);
   test_assert(strcmp(expected2, result2) == 0);
   free(result2);
@@ -124,8 +120,7 @@ void test_render_line() {
   char expected3[] =
     COLOR_RESET "foo     bar     baz     " COLOR_RED
                 "quux            gar" COLOR_DEFAULT "ply" CLEAR_LINE "\r\n";
-  line->original = "foo\tbar\tbaz\tquux\t\tgarply";
-  line->lowered = "foo\tbar\tbaz\tquux\t\tgarply";
+  string_set(line, "foo\tbar\tbaz\tquux\t\tgarply");
   Score *score = calculate_score(line, "qr");
   char *result3 = render_line(r, score, false);
   test_assert(strcmp(expected3, result3) == 0);
@@ -134,29 +129,25 @@ void test_render_line() {
   // test no highlighting when no query
   s->first = 0;
   s->last = 0;
-  line->original = "foobarbaz";
-  line->lowered = "foobarbaz";
+  string_set(line, "foobarbaz");
   char expected4[] = COLOR_RESET "foobarbaz" CLEAR_LINE "\r\n";
   char *result4 = render_line(r, s, false);
   test_assert(strcmp(expected4, result4) == 0);
   free(result4);
   // test expand tabs by itself
-  line->original = "foo\tbar";
-  line->lowered = "foo\tbar";
+  string_set(line, "foo\tbar");
   char expected5[] = COLOR_RESET "foo     bar" CLEAR_LINE "\r\n";
   char *result5 = render_line(r, s, false);
   test_assert(strcmp(expected5, result5) == 0);
   free(result5);
   // test expand tabs when tab is only one space wide visibly
-  line->original = "bazquux\tgarply";
-  line->lowered = "bazquux\tgarply";
+  string_set(line, "bazquux\tgarply");
   char expected6[] = COLOR_RESET "bazquux garply" CLEAR_LINE "\r\n";
   char *result6 = render_line(r, s, false);
   test_assert(strcmp(expected6, result6) == 0);
   free(result6);
   // test line truncation with highlighting
-  line->original = "foobarbazquuxgarply";
-  line->lowered = "foobarbazquuxgarply";
+  string_set(line, "foobarbazquuxgarply");
   r->width = 8;
   s->first = 3;
   s->last = 6;
