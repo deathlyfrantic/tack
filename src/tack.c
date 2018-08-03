@@ -135,6 +135,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   memset(query, 0, BUFSIZ);
   strcat(query, config->initial_search);
   size_t cursor = strlen(query);
+  bool need_new_scores = cursor > 0;
   size_t selected = 0;
   TTY *tty = tty_new();
   Renderer *renderer = renderer_new();
@@ -146,7 +147,6 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   renderer->width = tty->columns;
   Score *score;
   char c;
-  bool need_new_scores = strlen(query) > 0;
   HashTable *table = hashtable_new();
   hashtable_set(table, "", initial_scores);
   List *scores = initial_scores;
