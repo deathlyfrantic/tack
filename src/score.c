@@ -1,3 +1,4 @@
+#include "line.h"
 #include "score.h"
 #include "util.h"
 #include <ctype.h>
@@ -29,15 +30,13 @@ Score *score_new() {
 
 static bool single_char_query(Score *score, const char *query) {
   int16_t idx;
-  char *line = strtolower(score->line);
   bool rv = false;
-  if ((idx = find_char_idx(line, tolower(query[0]))) != -1) {
+  if ((idx = find_char_idx(score->line->lowered, tolower(query[0]))) != -1) {
     score->first = idx;
     score->last = idx + 1;
     score->points = 1;
     rv = true;
   }
-  free(line);
   return rv;
 }
 
@@ -75,11 +74,10 @@ static bool find_end_of_match(struct match *m, const char *line,
 static bool regular_query(Score *score, const char *_query) {
   bool found_score = false;
   struct match m;
-  char *line = strtolower(score->line);
   char *query = strtolower(_query);
-  for (size_t i = 0; i < strlen(line); i++) {
-    if (line[i] == query[0]) {
-      if (find_end_of_match(&m, line + 1, query + 1, i)) {
+  for (size_t i = 0; i < strlen(score->line->lowered); i++) {
+    if (score->line->lowered[i] == query[0]) {
+      if (find_end_of_match(&m, score->line->lowered + 1, query + 1, i)) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
@@ -89,12 +87,11 @@ static bool regular_query(Score *score, const char *_query) {
       }
     }
   }
-  free(line);
   free(query);
   return found_score;
 }
 
-Score *calculate_score(const char *line, const char *query) {
+Score *calculate_score(Line *line, const char *query) {
   Score *score = score_new();
   score->line = line;
   switch (strlen(query)) {
@@ -119,7 +116,7 @@ void _score_log(const char *name, Score *score) {
   if (score != NULL) {
     printf(" points %" PRIu16 "; first %" PRIu16 "; last %" PRIu16
            "; line \"%s\"",
-           score->points, score->first, score->last, score->line);
+           score->points, score->first, score->last, score->line->original);
   }
   printf("\n");
 }
@@ -136,43 +133,57 @@ void test_score_new() {
 }
 
 void test_calculate_score() {
+  Line *line = line_new();
+  line->original = "foo";
+  line->lowered = "foo";
   // verify NULL is returned if line doesn't contain query chars
-  test_assert(calculate_score("foo", "qxz") == NULL);
-  Score *score1 = calculate_score("oof", "f");
+  test_assert(calculate_score(line, "qxz") == NULL);
+  line->original = "oof";
+  line->lowered = "oof";
+  Score *score1 = calculate_score(line, "f");
   test_assert(score1->points == 1);
   test_assert(score1->first == 2);
   test_assert(score1->last == 3);
-  test_assert(strcmp(score1->line, "oof") == 0); // just to verify line gets set
+  test_assert(strcmp(score1->line->original, "oof") ==
+              0); // just to verify line gets set
   free(score1);
   // this should be case insensitive
-  Score *score2 = calculate_score("oof", "F");
+  Score *score2 = calculate_score(line, "F");
   test_assert(score2 != NULL);
   test_assert(score2->points == 1);
   test_assert(score2->first == 2);
   test_assert(score2->last == 3);
   free(score2);
-  Score *score3 = calculate_score("foofbbar", "fob");
+  line->original = "foofbbar";
+  line->lowered = "foofbbar";
+  Score *score3 = calculate_score(line, "fob");
   test_assert(score3->points == 5);
   test_assert(score3->first == 0);
   test_assert(score3->last == 5);
   free(score3);
-  Score *score4 = calculate_score("foo / ba r", "or");
+  line->original = "foo / ba r";
+  line->lowered = "foo / ba r";
+  Score *score4 = calculate_score(line, "or");
   test_assert(score4->points == 2);
   test_assert(score4->first == 1);
   test_assert(score4->last == 10);
   free(score4);
-  Score *score5 =
-    calculate_score("f||||||||b||||||||||||||a||||f||||||||r", "bar");
+  line->original = "f||||||||b||||||||||||||a||||f||||||||r";
+  line->lowered = "f||||||||b||||||||||||||a||||f||||||||r";
+  Score *score5 = calculate_score(line, "bar");
   test_assert(score5->points == 2);
   test_assert(score5->first == 9);
   test_assert(score5->last == 39);
   free(score5);
   // test that we get the best score
-  Score *score6 = calculate_score("foofoobar", "foob");
+  line->original = "foofoobar";
+  line->lowered = "foofoobar";
+  Score *score6 = calculate_score(line, "foob");
   test_assert(score6->points = 4);
   test_assert(score6->first = 3);
   test_assert(score6->last = 6);
   free(score6);
+  free(line);
 }
 
 #endif
