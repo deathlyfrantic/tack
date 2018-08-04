@@ -154,9 +154,9 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     renderer->query = query->buf;
     renderer->selected = selected;
     renderer->scores = scores;
-    char *output = renderer_render(renderer);
-    tty_write(tty, output);
-    free(output);
+    String *output = renderer_render(renderer);
+    tty_write(tty, output->buf);
+    string_free(output);
     switch ((c = tty_read_char(tty))) {
     case CTRL_KEY('c'):
       killed = true;

@@ -63,7 +63,7 @@ Renderer *renderer_new() {
   return r;
 }
 
-char *renderer_render(Renderer *r) {
+String *renderer_render(Renderer *r) {
   String *output = string_new_from(HIDE_CURSOR "\r\n");
   Score *score;
   for (size_t i = 0; i < r->height - 1; i++) {
@@ -86,7 +86,7 @@ char *renderer_render(Renderer *r) {
            r->query);
   string_concat(output, prompt);
   string_concat(output, SHOW_CURSOR CLEAR_LINE);
-  return output->buf;
+  return output;
 }
 
 #ifdef TESTS
