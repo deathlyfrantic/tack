@@ -245,9 +245,9 @@ void test_string_equals() {
   test_assert(string_iequals_string(s1, s2));
   string_free(s2);
   String *s3 = string_new_from("fOoBaR");
-  string_free(s3);
   test_assert(!string_equals_string(s1, s3));
   test_assert(string_iequals_string(s1, s3));
+  string_free(s3);
   test_assert(string_equals(s1, "FooBar"));
   test_assert(string_iequals(s1, "foobar"));
   test_assert(!string_iequals(s1, "jlaksjd"));
