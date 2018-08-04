@@ -94,12 +94,11 @@ static void free_scores(void *ptr) {
   free(scores);
 }
 
-static List *find_closest_scores(HashTable *table, const char *query) {
+static List *find_closest_scores(HashTable *table, String *query) {
   List *scores = NULL;
-  const size_t strlen_query = strlen(query);
-  char tmp[strlen_query + 1];
-  strcpy(tmp, query);
-  size_t cursor = strlen_query;
+  char tmp[query->length + 1];
+  strcpy(tmp, query->buf);
+  size_t cursor = query->length;
   while (cursor--) {
     tmp[cursor] = '\0';
     scores = hashtable_get(table, tmp);
@@ -147,7 +146,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       scores = hashtable_get(table, query->buf);
       if (scores == NULL) {
         scores =
-          calculate_scores(find_closest_scores(table, query->buf), query->buf);
+          calculate_scores(find_closest_scores(table, query), query->buf);
         hashtable_set(table, query, scores);
       }
       need_new_scores = false;
