@@ -36,22 +36,22 @@ static bool single_char_query(Score *score, String *query) {
   return true;
 }
 
-static bool find_end_of_match(struct match *m, const char *line,
-                              const char *query, size_t start) {
+static bool find_end_of_match(struct match *m, String *line, String *query,
+                              size_t start) {
   uint16_t last_index = start, score = 1;
-  int16_t index;
+  int32_t index;
   enum match_type last_match_type = MATCH_TYPE_NORMAL;
-  for (size_t i = 0; i < strlen(query); i++) {
-    if ((index = find_char_idx(line + last_index, query[i])) == -1) {
-      return false;
-    }
+  for (size_t i = 1; i < query->length; i++) {
+    index = string_find_ichar_from(line, string_get_char_at(query, i),
+                                   last_index + 1);
+    if (index == -1) return false;
     index += last_index;
     if (index == last_index + 1) {
       if (last_match_type != MATCH_TYPE_SEQUENTIAL) {
         last_match_type = MATCH_TYPE_SEQUENTIAL;
         score++;
       }
-    } else if (index > 0 && !isalnum(line[index - 1])) {
+    } else if (index > 0 && !isalnum(string_get_char_at(line, index))) {
       if (last_match_type != MATCH_TYPE_BOUNDARY) {
         last_match_type = MATCH_TYPE_BOUNDARY;
         score++;
@@ -67,12 +67,12 @@ static bool find_end_of_match(struct match *m, const char *line,
   return true;
 }
 
-static bool regular_query(Score *score, const char *query) {
+static bool regular_query(Score *score, String *query) {
   bool found_score = false;
   struct match m;
   for (size_t i = 0; i < score->line->length; i++) {
-    if (score->line->low[i] == query[0]) {
-      if (find_end_of_match(&m, score->line->low + 1, query + 1, i)) {
+    if (string_get_char_at(score->line, i) == string_get_char_at(query, 0)) {
+      if (find_end_of_match(&m, score->line, query, i)) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
@@ -97,7 +97,7 @@ Score *calculate_score(String *line, String *query) {
     }
     break;
   default:
-    if (regular_query(score, query->low)) {
+    if (regular_query(score, query)) {
       return score;
     }
   }
