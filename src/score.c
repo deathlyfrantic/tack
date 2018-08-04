@@ -70,8 +70,10 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
 static bool regular_query(Score *score, String *query) {
   bool found_score = false;
   struct match m;
+  char query_first_char = string_get_ichar_at(query, 0);
+  const char *raw_low = string_raw_low(score->line);
   for (size_t i = 0; i < score->line->length; i++) {
-    if (string_get_ichar_at(score->line, i) == string_get_ichar_at(query, 0)) {
+    if (raw_low[i] == query_first_char) {
       if (find_end_of_match(&m, score->line, query, i)) {
         found_score = true;
         if (m.score < score->points) {
