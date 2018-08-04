@@ -3,14 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-char *strtolower(const char *s) {
-  char *rv = strdup(s);
-  for (size_t i = 0; i < strlen(rv); i++) {
-    rv[i] = tolower(rv[i]);
-  }
-  return rv;
-}
-
 int16_t find_char_idx(const char *s, char c) {
   for (size_t i = 0; i < strlen(s); i++) {
     if (s[i] == c) {
@@ -29,11 +21,6 @@ uint8_t get_num_strlen(size_t num) {
 
 #ifdef TESTS
 #include "test.h"
-
-void test_strtolower() {
-  test_assert(strcmp(strtolower("FOOBAR"), "foobar") == 0);
-  test_assert(strcmp(strtolower("BAZQUUX"), "BAZQUUX") != 0);
-}
 
 void test_find_char_idx() {
   test_assert(find_char_idx("foobar", 'b') == 3);
