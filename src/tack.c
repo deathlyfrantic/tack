@@ -194,7 +194,8 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     default:
       if (isprint(c)) {
         string_push_char(query, c);
-        need_new_scores = true;
+        // don't bother calculating new scores if there are currently 0 matches
+        need_new_scores = scores->length > 0;
       }
       break;
     }
