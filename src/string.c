@@ -34,6 +34,14 @@ String *string_dup(String *old) {
   return string_new_from(old->buf);
 }
 
+const char *string_raw(String *s) {
+  return s->buf;
+}
+
+const char *string_raw_low(String *s) {
+  return s->low;
+}
+
 char string_get_char_at(String *s, size_t i) {
   if (i > s->length) return '\0';
   return s->buf[i];
