@@ -40,6 +40,11 @@ char string_get_char_at(String *s, size_t i) {
   return s->buf[i];
 }
 
+char string_get_ichar_at(String *s, size_t i) {
+  if (i > s->length) return '\0';
+  return s->low[i];
+}
+
 void string_push_char(String *s, char c) {
   if (s->length == s->capacity) {
     string_grow(s);
