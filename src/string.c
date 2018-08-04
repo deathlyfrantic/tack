@@ -107,23 +107,31 @@ void string_free(String *s) {
   free(s);
 }
 
-int32_t string_find_char(String *s, char c) {
-  for (size_t i = 0; i < s->length; i++) {
-    if (s->buf[i] == c) {
+static int32_t find_char(const char *s, size_t length, char c) {
+  for (size_t i = 0; i < length; i++) {
+    if (s[i] == c) {
       return i;
     }
   }
   return -1;
 }
 
+int32_t string_find_char(String *s, char c) {
+  return find_char(s->buf, s->length, c);
+}
+
 int32_t string_find_ichar(String *s, char c) {
-  c = tolower(c);
-  for (size_t i = 0; i < s->length; i++) {
-    if (s->low[i] == c) {
-      return i;
-    }
-  }
-  return -1;
+  return find_char(s->low, s->length, tolower(c));
+}
+
+int32_t string_find_char_from(String *s, char c, size_t start) {
+  if (start > s->length) return -1;
+  return find_char(s->buf + start, s->length - start, c);
+}
+
+int32_t string_find_ichar_from(String *s, char c, size_t start) {
+  if (start > s->length) return -1;
+  return find_char(s->low + start, s->length - start, tolower(c));
 }
 
 size_t string_count_chars(String *s, char c) {
@@ -271,6 +279,10 @@ void test_string_find_char() {
   test_assert(string_find_ichar(s, 'F') == 0);
   test_assert(string_find_char(s, 'x') == -1);
   test_assert(string_find_ichar(s, 'x') == -1);
+  test_assert(string_find_char_from(s, 'o', 3) == 4);
+  test_assert(string_find_char_from(s, 'o', 2) == 0);
+  test_assert(string_find_ichar_from(s, 'f', 1) == 5);
+  test_assert(string_find_char_from(s, 'x', 3) == -1);
   string_free(s);
 }
 
