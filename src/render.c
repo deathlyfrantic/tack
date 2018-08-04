@@ -121,10 +121,12 @@ void test_render_line() {
     COLOR_RESET "foo     bar     baz     " COLOR_RED
                 "quux            gar" COLOR_DEFAULT "ply" CLEAR_LINE "\r\n";
   string_set(line, "foo\tbar\tbaz\tquux\t\tgarply");
-  Score *score = calculate_score(line, "qr");
+  String *query = string_new_from("qr");
+  Score *score = calculate_score(line, query);
   char *result3 = render_line(r, score, false);
   test_assert(strcmp(expected3, result3) == 0);
   free(score);
+  string_free(query);
   free(result3);
   // test no highlighting when no query
   s->first = 0;

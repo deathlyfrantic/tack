@@ -27,16 +27,13 @@ Score *score_new() {
   return score;
 }
 
-static bool single_char_query(Score *score, const char *query) {
-  int16_t idx;
-  bool rv = false;
-  if ((idx = string_find_ichar(score->line, query[0])) != -1) {
-    score->first = idx;
-    score->last = idx + 1;
-    score->points = 1;
-    rv = true;
-  }
-  return rv;
+static bool single_char_query(Score *score, String *query) {
+  int32_t idx = string_find_ichar(score->line, string_get_char_at(query, 0));
+  if (idx == -1) return false;
+  score->first = idx;
+  score->last = idx + 1;
+  score->points = 1;
+  return true;
 }
 
 static bool find_end_of_match(struct match *m, const char *line,
@@ -70,10 +67,9 @@ static bool find_end_of_match(struct match *m, const char *line,
   return true;
 }
 
-static bool regular_query(Score *score, const char *_query) {
+static bool regular_query(Score *score, const char *query) {
   bool found_score = false;
   struct match m;
-  char *query = strtolower(_query);
   for (size_t i = 0; i < score->line->length; i++) {
     if (score->line->low[i] == query[0]) {
       if (find_end_of_match(&m, score->line->low + 1, query + 1, i)) {
@@ -86,14 +82,13 @@ static bool regular_query(Score *score, const char *_query) {
       }
     }
   }
-  free(query);
   return found_score;
 }
 
-Score *calculate_score(String *line, const char *query) {
+Score *calculate_score(String *line, String *query) {
   Score *score = score_new();
   score->line = line;
-  switch (strlen(query)) {
+  switch (query->length) {
   case 0:
     return score;
   case 1:
@@ -102,7 +97,7 @@ Score *calculate_score(String *line, const char *query) {
     }
     break;
   default:
-    if (regular_query(score, query)) {
+    if (regular_query(score, query->low)) {
       return score;
     }
   }
@@ -134,47 +129,55 @@ void test_score_new() {
 void test_calculate_score() {
   String *s = string_new_from("foo");
   // verify NULL is returned if line doesn't contain query chars
-  test_assert(calculate_score(s, "qxz") == NULL);
+  String *query = string_new_from("qxz");
+  test_assert(calculate_score(s, query) == NULL);
   string_set(s, "oof");
-  Score *score1 = calculate_score(s, "f");
+  string_set(query, "f");
+  Score *score1 = calculate_score(s, query);
   test_assert(score1->points == 1);
   test_assert(score1->first == 2);
   test_assert(score1->last == 3);
   test_assert(string_equals(score1->line, "oof"));
   free(score1);
   // this should be case insensitive
-  Score *score2 = calculate_score(s, "F");
+  string_set(query, "F");
+  Score *score2 = calculate_score(s, query);
   test_assert(score2 != NULL);
   test_assert(score2->points == 1);
   test_assert(score2->first == 2);
   test_assert(score2->last == 3);
   free(score2);
   string_set(s, "foofbbar");
-  Score *score3 = calculate_score(s, "fob");
+  string_set(query, "fob");
+  Score *score3 = calculate_score(s, query);
   test_assert(score3->points == 5);
   test_assert(score3->first == 0);
   test_assert(score3->last == 5);
   free(score3);
   string_set(s, "foo / ba r");
-  Score *score4 = calculate_score(s, "or");
+  string_set(query, "or");
+  Score *score4 = calculate_score(s, query);
   test_assert(score4->points == 2);
   test_assert(score4->first == 1);
   test_assert(score4->last == 10);
   free(score4);
   string_set(s, "f||||||||b||||||||||||||a||||f||||||||r");
-  Score *score5 = calculate_score(s, "bar");
+  string_set(query, "bar");
+  Score *score5 = calculate_score(s, query);
   test_assert(score5->points == 2);
   test_assert(score5->first == 9);
   test_assert(score5->last == 39);
   free(score5);
   // test that we get the best score
   string_set(s, "foofoobar");
-  Score *score6 = calculate_score(s, "foob");
+  string_set(query, "foob");
+  Score *score6 = calculate_score(s, query);
   test_assert(score6->points = 4);
   test_assert(score6->first = 3);
   test_assert(score6->last = 6);
   free(score6);
-  free(s);
+  string_free(s);
+  string_free(query);
 }
 
 #endif
