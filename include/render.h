@@ -3,6 +3,7 @@
 
 #include "list.h"
 #include "score.h"
+#include "tack-string.h"
 #include <stdint.h>
 
 // clang-format off
@@ -39,6 +40,6 @@ typedef struct {
 } Renderer;
 
 Renderer *renderer_new();
-char *renderer_render(Renderer *);
+String *renderer_render(Renderer *);
 
 #endif /* end of include guard: TACK_RENDER_H */
