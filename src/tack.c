@@ -126,11 +126,8 @@ static List *calculate_scores(List *old, const char *query) {
 
 static bool run_main_loop(List *initial_scores, Config *config) {
   bool killed = false;
-  char query[BUFSIZ];
-  memset(query, 0, BUFSIZ);
-  strcat(query, config->initial_search);
-  size_t cursor = strlen(query);
-  bool need_new_scores = cursor > 0;
+  String *query = string_new_from(config->initial_search);
+  bool need_new_scores = query->length > 0;
   size_t selected = 0;
   TTY *tty = tty_new();
   Renderer *renderer = renderer_new();
@@ -147,15 +144,16 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   List *scores = initial_scores;
   while (true) {
     if (need_new_scores) {
-      scores = hashtable_get(table, query);
+      scores = hashtable_get(table, query->buf);
       if (scores == NULL) {
-        scores = calculate_scores(find_closest_scores(table, query), query);
+        scores =
+          calculate_scores(find_closest_scores(table, query->buf), query->buf);
         hashtable_set(table, query, scores);
       }
       need_new_scores = false;
     }
     selected = MIN(selected, scores->length - 1);
-    renderer->query = query;
+    renderer->query = query->buf;
     renderer->selected = selected;
     renderer->scores = scores;
     char *output = renderer_render(renderer);
@@ -181,36 +179,23 @@ static bool run_main_loop(List *initial_scores, Config *config) {
         selected = renderer->height - 2;
       }
       break;
-    case CTRL_KEY('w'): {
-      bool seen_char = false;
-      while (true) {
-        if (cursor == 0 || !isspace(query[cursor - 1])) {
-          seen_char = true;
-        }
-        query[cursor] = '\0';
-        if (cursor == 0 || (isspace(query[cursor - 1]) && seen_char)) {
-          need_new_scores = true;
-          break;
-        }
-        cursor--;
-      }
+    case CTRL_KEY('w'):
+      string_delete_word(query);
+      need_new_scores = true;
       break;
-    }
     case CTRL_KEY('u'):
-      memset(query, 0, sizeof(char) * BUFSIZ);
-      cursor = 0;
+      string_reset(query);
       need_new_scores = true;
       break;
     case 127: // backspace
-      if (cursor > 0) {
-        query[--cursor] = '\0';
+      if (query->length > 0) {
+        string_pop_char(query);
         need_new_scores = true;
       }
       break;
     default:
       if (isprint(c)) {
-        query[cursor++] = c;
-        query[cursor] = '\0';
+        string_push_char(query, c);
         need_new_scores = true;
       }
       break;
