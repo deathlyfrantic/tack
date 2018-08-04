@@ -29,6 +29,8 @@ bool string_iequals_string(String *, String *);
 void string_free(String *);
 int32_t string_find_char(String *, char);
 int32_t string_find_ichar(String *, char);
+int32_t string_find_char_from(String *, char, size_t);
+int32_t string_find_ichar_from(String *, char, size_t);
 size_t string_count_chars(String *, char);
 size_t string_count_ichars(String *, char);
 
