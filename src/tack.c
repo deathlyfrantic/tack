@@ -109,7 +109,7 @@ static List *find_closest_scores(HashTable *table, String *query) {
   return scores;
 }
 
-static List *calculate_scores(List *old, const char *query) {
+static List *calculate_scores(List *old, String *query) {
   List *scores = list_new_of_size(old->length);
   Score *old_score, *score;
   for (size_t i = 0; i < old->length; i++) {
@@ -145,8 +145,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     if (need_new_scores) {
       scores = hashtable_get(table, query->buf);
       if (scores == NULL) {
-        scores =
-          calculate_scores(find_closest_scores(table, query), query->buf);
+        scores = calculate_scores(find_closest_scores(table, query), query);
         hashtable_set(table, query, scores);
       }
       need_new_scores = false;
@@ -228,10 +227,12 @@ int main(int argc, char *argv[]) {
   List *lines = get_lines_from_stdin();
   List *scores = list_new_of_size(lines->length);
   Score *score;
+  String *empty = string_new();
   for (size_t i = 0; i < lines->length; i++) {
-    score = calculate_score(lines->items[i], "");
+    score = calculate_score(lines->items[i], empty);
     list_push(scores, score);
   }
+  string_free(empty);
   killed = run_main_loop(scores, config);
   for (size_t i = 0; i < lines->length; i++) {
     string_free(lines->items[i]);

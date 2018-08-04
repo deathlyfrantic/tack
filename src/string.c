@@ -35,6 +35,11 @@ String *string_dup(String *old) {
   return string_new_from(old->buf);
 }
 
+char string_get_char_at(String *s, size_t i) {
+  if (i > s->length) return '\0';
+  return s->buf[i];
+}
+
 void string_push_char(String *s, char c) {
   if (s->length == s->capacity) {
     string_grow(s);

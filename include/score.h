@@ -13,7 +13,7 @@ typedef struct {
 } Score;
 
 Score *score_new();
-Score *calculate_score(String *, const char *);
+Score *calculate_score(String *, String *);
 void _score_log(const char *, Score *);
 
 #define score_log(a) _score_log(#a, a);
