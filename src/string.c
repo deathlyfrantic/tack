@@ -6,8 +6,10 @@
 
 #define STRING_DEFAULT_CAPACITY 100
 
-static void string_grow(String *s) {
-  s->capacity += s->size;
+static void string_grow(String *s, size_t needed) {
+  while (s->capacity < needed) {
+    s->capacity += s->size;
+  }
   s->buf = realloc(s->buf, sizeof(char) * s->capacity);
   s->low = realloc(s->low, sizeof(char) * s->capacity);
 }
@@ -23,11 +25,8 @@ String *string_new() {
 }
 
 String *string_new_from(char *source) {
-  char c;
   String *string = string_new();
-  while ((c = *source++)) {
-    string_push_char(string, c);
-  }
+  string_concat(string, source);
   return string;
 }
 
@@ -47,7 +46,7 @@ char string_get_ichar_at(String *s, size_t i) {
 
 void string_push_char(String *s, char c) {
   if (s->length == s->capacity) {
-    string_grow(s);
+    string_grow(s, s->capacity * 2);
   }
   s->buf[s->length] = c;
   s->low[s->length] = tolower(c);
@@ -64,10 +63,18 @@ char string_pop_char(String *s) {
 }
 
 void string_concat(String *string, const char *s) {
-  char c;
-  while ((c = *s++)) {
-    string_push_char(string, c);
+  size_t strlen_s = strlen(s);
+  char lowered[strlen_s + 1];
+  memset(&lowered, 0, strlen_s + 1);
+  for (size_t i = 0; i < strlen_s; i++) {
+    lowered[i] = tolower(s[i]);
   }
+  if (string->length + strlen_s > string->capacity) {
+    string_grow(string, string->length + strlen_s);
+  }
+  strcat(string->buf, s);
+  strcat(string->low, lowered);
+  string->length += strlen_s;
 }
 
 void string_delete_word(String *s) {
