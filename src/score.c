@@ -42,8 +42,8 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
   int32_t index;
   enum match_type last_match_type = MATCH_TYPE_NORMAL;
   for (size_t i = 1; i < query->length; i++) {
-    index = string_find_ichar_from(line, string_get_char_at(query, i),
-                                   last_index + 1);
+    index =
+      string_find_ichar_from(line, string_get_char_at(query, i), last_index);
     if (index == -1) return false;
     index += last_index;
     if (index == last_index + 1) {
@@ -51,7 +51,7 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
         last_match_type = MATCH_TYPE_SEQUENTIAL;
         score++;
       }
-    } else if (index > 0 && !isalnum(string_get_char_at(line, index))) {
+    } else if (index > 0 && !isalnum(string_get_char_at(line, index - 1))) {
       if (last_match_type != MATCH_TYPE_BOUNDARY) {
         last_match_type = MATCH_TYPE_BOUNDARY;
         score++;
@@ -71,12 +71,12 @@ static bool regular_query(Score *score, String *query) {
   bool found_score = false;
   struct match m;
   for (size_t i = 0; i < score->line->length; i++) {
-    if (string_get_char_at(score->line, i) == string_get_char_at(query, 0)) {
+    if (string_get_ichar_at(score->line, i) == string_get_ichar_at(query, 0)) {
       if (find_end_of_match(&m, score->line, query, i)) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
-          score->last = m.last + 1;
+          score->last = m.last;
           score->first = i;
         }
       }
@@ -176,6 +176,14 @@ void test_calculate_score() {
   test_assert(score6->first = 3);
   test_assert(score6->last = 6);
   free(score6);
+  // apparently there are no tests that would catch case sensitivity? dumb
+  string_set(s, "FOOBAR");
+  string_set(query, "foo");
+  Score *score7 = calculate_score(s, query);
+  test_assert(score7->first == 0);
+  test_assert(score7->last == 3);
+  test_assert(score7->points == 3);
+  free(score7);
   string_free(s);
   string_free(query);
 }
