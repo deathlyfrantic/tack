@@ -112,7 +112,7 @@ void _score_log(const char *name, Score *score) {
   if (score != NULL) {
     printf(" points %" PRIu16 "; first %" PRIu16 "; last %" PRIu16
            "; line \"%s\"",
-           score->points, score->first, score->last, score->line->buf);
+           score->points, score->first, score->last, string_raw(score->line));
   }
   printf("\n");
 }
