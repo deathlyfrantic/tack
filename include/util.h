@@ -6,7 +6,6 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-int16_t find_char_idx(const char *, char);
 uint8_t get_num_strlen(size_t);
 
 #endif /* end of include guard: TACK_UTIL_H */
