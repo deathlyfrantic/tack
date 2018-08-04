@@ -140,7 +140,7 @@ void test_calculate_score() {
   test_assert(score1->points == 1);
   test_assert(score1->first == 2);
   test_assert(score1->last == 3);
-  test_assert(string_equals(score1->line, s));
+  test_assert(string_equals(score1->line, "oof"));
   free(score1);
   // this should be case insensitive
   Score *score2 = calculate_score(s, "F");
