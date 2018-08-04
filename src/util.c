@@ -28,16 +28,6 @@ uint8_t get_num_strlen(size_t num) {
   return strlen(buf);
 }
 
-size_t count_chars_in_string(const char *s, char c) {
-  size_t rv = 0;
-  for (size_t i = 0; i < strlen(s); i++) {
-    if (s[i] == c) {
-      rv++;
-    }
-  }
-  return rv;
-}
-
 #ifdef TESTS
 #include "test.h"
 
@@ -57,11 +47,6 @@ void test_get_num_strlen() {
   test_assert(get_num_strlen(500) == 3);
   test_assert(get_num_strlen(5000) == 4);
   test_assert(get_num_strlen(50000) == 5);
-}
-
-void test_count_chars_in_string() {
-  test_assert(count_chars_in_string("foobar", 'x') == 0);
-  test_assert(count_chars_in_string("f\tf\t\t\t\tf\t", '\t') == 6);
 }
 
 #endif
