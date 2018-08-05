@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_SIZE 20
+#define HASHTABLE_DEFAULT_SIZE 20
 
 static uint32_t hash_string(const void *_s) {
   const char *s = _s;
@@ -18,8 +18,8 @@ static uint32_t hash_string(const void *_s) {
 
 HashTable *hashtable_new() {
   HashTable *rv = malloc(sizeof(HashTable));
-  rv->size = DEFAULT_SIZE;
-  rv->buckets = calloc(DEFAULT_SIZE, sizeof(HashTableEntry));
+  rv->size = HASHTABLE_DEFAULT_SIZE;
+  rv->buckets = calloc(HASHTABLE_DEFAULT_SIZE, sizeof(HashTableEntry));
   rv->hash = hash_string;
   return rv;
 }
