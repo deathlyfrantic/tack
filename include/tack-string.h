@@ -1,5 +1,5 @@
-#ifndef TACK_STRING_C
-#define TACK_STRING_C
+#ifndef TACK_STRING_H
+#define TACK_STRING_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -38,4 +38,4 @@ int32_t string_find_ichar_from(String *, char, size_t);
 size_t string_count_chars(String *, char);
 size_t string_count_ichars(String *, char);
 
-#endif /* end of include guard: TACK_STRING_C */
+#endif /* end of include guard: TACK_STRING_H */
