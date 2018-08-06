@@ -1,6 +1,7 @@
 #ifndef TACK_STRING_H
 #define TACK_STRING_H
 
+#include "charmap.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,6 +12,8 @@ typedef struct {
   size_t length;
   size_t capacity;
   size_t size;
+  CharMap *charmap;
+  CharMap *lowcharmap;
 } String;
 
 String *string_new();

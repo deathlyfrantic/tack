@@ -176,7 +176,7 @@ void test_charmap_entry_delete_position() {
   charmap_entry_free(entry);
 }
 
-void test_charmap_get_position_after() {
+void test_charmap() {
   CharMap *map = charmap_new();
   charmap_add_position(map, 'f', 0);
   charmap_add_position(map, 'o', 1);
@@ -188,6 +188,27 @@ void test_charmap_get_position_after() {
   test_assert(charmap_get_position_after(map, 'o', 1) == 2);
   test_assert(charmap_get_position_after(map, 'r', 0) == 5);
   test_assert(charmap_get_position_after(map, 'x', 0) == 0);
+  charmap_delete_position(map, 'o', 2);
+  test_assert(charmap_get_position_after(map, 'o', 1) == 0);
+  charmap_reset(map);
+  char a = 'a', b = 'b', c = 'c', x = 'x';
+  for (size_t i = 0; i < 30; i++) {
+    if (i < 10) {
+      charmap_add_position(map, a, 0);
+    }
+    if (i < 20) {
+      charmap_add_position(map, b, 1);
+    }
+    charmap_add_position(map, c, 0);
+  }
+  CharMapEntry *entry_a = hashtable_get(map, &a);
+  CharMapEntry *entry_b = hashtable_get(map, &b);
+  CharMapEntry *entry_c = hashtable_get(map, &c);
+  CharMapEntry *entry_x = hashtable_get(map, &x);
+  test_assert(entry_a->length == 10);
+  test_assert(entry_b->length == 20);
+  test_assert(entry_c->length == 30);
+  test_assert(entry_x == NULL);
 }
 
 #endif

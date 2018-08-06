@@ -42,44 +42,41 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
   int32_t index;
   enum match_type last_match_type = MATCH_TYPE_NORMAL;
   for (size_t i = 1; i < query->length; i++) {
-    index =
-      string_find_ichar_from(line, string_get_char_at(query, i), last_index);
+    index = string_find_ichar_from(line, query->buf[i], last_index);
     if (index == -1) return false;
-    index += last_index;
     if (index == last_index + 1) {
       if (last_match_type != MATCH_TYPE_SEQUENTIAL) {
         last_match_type = MATCH_TYPE_SEQUENTIAL;
         score++;
       }
-    } else if (index > 0 && !isalnum(string_get_char_at(line, index - 1))) {
+    } else if (index > 0 && !isalnum(line->buf[index - 1])) {
       if (last_match_type != MATCH_TYPE_BOUNDARY) {
         last_match_type = MATCH_TYPE_BOUNDARY;
         score++;
       }
     } else {
       last_match_type = MATCH_TYPE_NORMAL;
-      score += index - last_index + 1;
+      score += index - last_index;
     }
-    last_index = index + 1;
+    last_index = index;
   }
   m->score = score;
-  m->last = last_index;
+  m->last = last_index + 1;
   return true;
 }
 
 static bool regular_query(Score *score, String *query) {
   bool found_score = false;
   struct match m;
-  char query_first_char = string_get_ichar_at(query, 0);
-  const char *raw_low = string_raw_low(score->line);
-  for (size_t i = 0; i < score->line->length; i++) {
-    if (raw_low[i] == query_first_char) {
-      if (find_end_of_match(&m, score->line, query, i)) {
+  CharMapEntry *entry = hashtable_get(score->line->lowcharmap, &query->low[0]);
+  if (entry != NULL) {
+    for (size_t i = 0; i < entry->length; i++) {
+      if (find_end_of_match(&m, score->line, query, entry->positions[i])) {
         found_score = true;
         if (m.score < score->points) {
           score->points = m.score;
           score->last = m.last;
-          score->first = i;
+          score->first = entry->positions[i];
         }
       }
     }
@@ -184,7 +181,7 @@ void test_calculate_score() {
   Score *score7 = calculate_score(s, query);
   test_assert(score7->first == 0);
   test_assert(score7->last == 3);
-  test_assert(score7->points == 3);
+  test_assert(score7->points == 2);
   free(score7);
   string_free(s);
   string_free(query);

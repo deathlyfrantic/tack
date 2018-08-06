@@ -1,5 +1,7 @@
+#include "charmap.h"
 #include "tack-string.h"
 #include <ctype.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +23,8 @@ String *string_new() {
   string->size = string->capacity;
   string->buf = calloc(string->capacity, sizeof(char));
   string->low = calloc(string->capacity, sizeof(char));
+  string->charmap = charmap_new();
+  string->lowcharmap = charmap_new();
   return string;
 }
 
@@ -56,6 +60,8 @@ void string_push_char(String *s, char c) {
   if (s->length == s->capacity) {
     string_grow(s, s->capacity * 2);
   }
+  charmap_add_position(s->charmap, c, s->length);
+  charmap_add_position(s->lowcharmap, tolower(c), s->length);
   s->buf[s->length] = c;
   s->low[s->length] = tolower(c);
   s->length++;
@@ -67,6 +73,8 @@ char string_pop_char(String *s) {
   char c = s->buf[s->length];
   s->buf[s->length] = '\0';
   s->low[s->length] = '\0';
+  charmap_delete_position(s->charmap, c, s->length);
+  charmap_delete_position(s->lowcharmap, tolower(c), s->length);
   return c;
 }
 
@@ -82,6 +90,10 @@ void string_concat(String *string, const char *s) {
   }
   strcat(string->buf, s);
   strcat(string->low, lowered);
+  for (size_t i = 0; i < strlen_s; i++) {
+    charmap_add_position(string->charmap, s[i], string->length + i);
+    charmap_add_position(string->lowcharmap, tolower(s[i]), string->length + i);
+  }
   string->length += strlen_s;
 }
 
@@ -106,6 +118,8 @@ void string_set(String *string, const char *s) {
 void string_reset(String *s) {
   memset(s->buf, 0, s->length);
   memset(s->low, 0, s->length);
+  charmap_reset(s->charmap);
+  charmap_reset(s->lowcharmap);
   s->length = 0;
 }
 
@@ -127,6 +141,8 @@ bool string_iequals_string(String *s1, String *s2) {
 
 void string_free(String *s) {
   if (s == NULL) return;
+  charmap_free(s->charmap);
+  charmap_free(s->lowcharmap);
   free(s->buf);
   free(s->low);
   free(s);
@@ -156,28 +172,20 @@ int32_t string_find_char_from(String *s, char c, size_t start) {
 
 int32_t string_find_ichar_from(String *s, char c, size_t start) {
   if (start > s->length) return -1;
-  return find_char(s->low + start, s->length - start, tolower(c));
+  size_t pos = charmap_get_position_after(s->lowcharmap, tolower(c), start);
+  return pos == 0 ? -1 : pos;
 }
 
 size_t string_count_chars(String *s, char c) {
-  size_t rv = 0;
-  for (size_t i = 0; i < s->length; i++) {
-    if (s->buf[i] == c) {
-      rv++;
-    }
-  }
-  return rv;
+  CharMapEntry *entry = hashtable_get(s->charmap, &c);
+  if (entry == NULL) return 0;
+  return entry->length;
 }
 
 size_t string_count_ichars(String *s, char c) {
-  c = tolower(c);
-  size_t rv = 0;
-  for (size_t i = 0; i < s->length; i++) {
-    if (s->low[i] == c) {
-      rv++;
-    }
-  }
-  return rv;
+  CharMapEntry *entry = hashtable_get(s->lowcharmap, &c);
+  if (entry == NULL) return 0;
+  return entry->length;
 }
 
 #ifdef TESTS
@@ -306,7 +314,9 @@ void test_string_find_char() {
   test_assert(string_find_ichar(s, 'x') == -1);
   test_assert(string_find_char_from(s, 'o', 3) == 4);
   test_assert(string_find_char_from(s, 'o', 2) == 0);
-  test_assert(string_find_ichar_from(s, 'f', 1) == 5);
+  test_assert(string_find_ichar_from(s, 'f', 1) == 6);
+  test_assert(string_find_ichar_from(s, 'f', 3) == 6);
+  test_assert(string_find_ichar_from(s, 'x', 0) == -1);
   test_assert(string_find_char_from(s, 'x', 3) == -1);
   string_free(s);
 }
