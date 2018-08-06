@@ -30,10 +30,6 @@ String *string_new_from(char *source) {
   return string;
 }
 
-String *string_dup(String *old) {
-  return string_new_from(old->buf);
-}
-
 const char *string_raw(String *s) {
   return s->buf;
 }
@@ -113,18 +109,6 @@ bool string_equals(String *string, const char *s) {
   return strcmp(string->buf, s) == 0;
 }
 
-bool string_iequals(String *string, const char *s) {
-  return strcasecmp(string->buf, s) == 0;
-}
-
-bool string_equals_string(String *s1, String *s2) {
-  return strcmp(s1->buf, s2->buf) == 0;
-}
-
-bool string_iequals_string(String *s1, String *s2) {
-  return strcmp(s1->low, s2->low) == 0;
-}
-
 void string_free(String *s) {
   if (s == NULL) return;
   free(s->buf);
@@ -169,17 +153,6 @@ size_t string_count_chars(String *s, char c) {
   return rv;
 }
 
-size_t string_count_ichars(String *s, char c) {
-  c = tolower(c);
-  size_t rv = 0;
-  for (size_t i = 0; i < s->length; i++) {
-    if (s->low[i] == c) {
-      rv++;
-    }
-  }
-  return rv;
-}
-
 #ifdef TESTS
 #include "test.h"
 
@@ -197,16 +170,6 @@ void test_string_new_from() {
   test_assert(strcmp(s->low, "foobar") == 0);
   test_assert(s->length == 6);
   string_free(s);
-}
-
-void test_string_dup() {
-  String *s1 = string_new_from("FooBar");
-  String *s2 = string_dup(s1);
-  test_assert(string_equals_string(s1, s2));
-  test_assert(string_iequals_string(s1, s2));
-  test_assert(&s1 != &s2);
-  string_free(s1);
-  string_free(s2);
 }
 
 void test_string_grow() {
@@ -259,19 +222,10 @@ void test_string_reset() {
 }
 
 void test_string_equals() {
-  String *s1 = string_new_from("FooBar");
-  String *s2 = string_new_from("FooBar");
-  test_assert(string_equals_string(s1, s2));
-  test_assert(string_iequals_string(s1, s2));
-  string_free(s2);
-  String *s3 = string_new_from("fOoBaR");
-  test_assert(!string_equals_string(s1, s3));
-  test_assert(string_iequals_string(s1, s3));
-  string_free(s3);
-  test_assert(string_equals(s1, "FooBar"));
-  test_assert(string_iequals(s1, "foobar"));
-  test_assert(!string_iequals(s1, "jlaksjd"));
-  string_free(s1);
+  String *s = string_new_from("FooBar");
+  test_assert(string_equals(s, "FooBar"));
+  test_assert(!string_equals(s, "BazQuux"));
+  string_free(s);
 }
 
 void test_string_concat() {
@@ -288,7 +242,7 @@ void test_string_delete_word() {
   string_delete_word(s);
   test_assert(string_equals(s, " Foo Bar "));
   string_delete_word(s);
-  test_assert(string_iequals(s, " FOO "));
+  test_assert(string_equals(s, " Foo "));
   string_delete_word(s);
   test_assert(string_equals(s, " "));
   string_delete_word(s);
@@ -316,9 +270,6 @@ void test_string_count_chars() {
   test_assert(string_count_chars(s, 'f') == 2);
   test_assert(string_count_chars(s, 'o') == 4);
   test_assert(string_count_chars(s, 'x') == 0);
-  test_assert(string_count_ichars(s, 'f') == 3);
-  test_assert(string_count_ichars(s, 'o') == 6);
-  test_assert(string_count_ichars(s, 'x') == 0);
   string_free(s);
 }
 
