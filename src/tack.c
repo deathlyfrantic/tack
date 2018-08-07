@@ -155,7 +155,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     renderer->selected = selected;
     renderer->scores = scores;
     String *output = renderer_render(renderer);
-    tty_write(tty, output->buf);
+    tty_write(tty, output);
     string_free(output);
     switch ((c = tty_read_char(tty))) {
     case CTRL_KEY('c'):
@@ -200,11 +200,13 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       break;
     }
   }
-exit:
+exit:;
   // clear all extant output
+  String *clear = string_new_from(COLOR_RESET CLEAR_WHOLE_LINE "\r\n");
   for (size_t i = 0; i < renderer->height; i++) {
-    tty_write(tty, COLOR_RESET CLEAR_WHOLE_LINE "\r\n");
+    tty_write(tty, clear);
   }
+  string_free(clear);
   tty_teardown_and_free(tty);
   if (!killed) {
     // write selected line to stdout
