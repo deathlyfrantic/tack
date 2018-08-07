@@ -55,8 +55,8 @@ void string_concat(String *string, const char *s) {
   for (size_t i = 0; i < strlen_s; i++) {
     lowered[i] = tolower(s[i]);
   }
-  if (string->length + strlen_s > string->capacity) {
-    string_grow(string, string->length + strlen_s);
+  if (string->length + strlen_s + 1 > string->capacity) {
+    string_grow(string, string->length + strlen_s + 1);
   }
   strcat(string->buf, s);
   strcat(string->low, lowered);
