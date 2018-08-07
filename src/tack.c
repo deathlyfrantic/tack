@@ -146,7 +146,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       scores = hashtable_get(table, query->buf);
       if (scores == NULL) {
         scores = calculate_scores(find_closest_scores(table, query), query);
-        hashtable_set(table, query, scores);
+        hashtable_set(table, query->buf, scores);
       }
       need_new_scores = false;
     }
