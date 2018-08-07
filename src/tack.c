@@ -97,7 +97,7 @@ static void free_scores(void *ptr) {
 static List *find_closest_scores(HashTable *table, String *query) {
   List *scores = NULL;
   char tmp[query->length + 1];
-  strcpy(tmp, string_raw(query));
+  strcpy(tmp, query->buf);
   size_t cursor = query->length;
   while (cursor--) {
     tmp[cursor] = '\0';
@@ -143,7 +143,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   List *scores = initial_scores;
   while (true) {
     if (need_new_scores) {
-      scores = hashtable_get(table, string_raw(query));
+      scores = hashtable_get(table, query->buf);
       if (scores == NULL) {
         scores = calculate_scores(find_closest_scores(table, query), query);
         hashtable_set(table, query, scores);
@@ -151,11 +151,11 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       need_new_scores = false;
     }
     selected = MIN(selected, scores->length - 1);
-    renderer->query = string_raw(query);
+    renderer->query = query->buf;
     renderer->selected = selected;
     renderer->scores = scores;
     String *output = renderer_render(renderer);
-    tty_write(tty, string_raw(output));
+    tty_write(tty, output->buf);
     string_free(output);
     switch ((c = tty_read_char(tty))) {
     case CTRL_KEY('c'):
@@ -209,7 +209,7 @@ exit:
   if (!killed) {
     // write selected line to stdout
     score = scores->items[selected];
-    puts(string_raw(score->line));
+    puts(score->line->buf);
   }
   hashtable_free_items(table, free_scores);
   hashtable_free(table);

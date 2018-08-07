@@ -36,14 +36,14 @@ static char *render_line(Renderer *renderer, Score *score,
         cursor += strlen(COLOR_DEFAULT);
       }
     }
-    if (string_get_char_at(score->line, i) == '\t') {
+    if (score->line->buf[i] == '\t') {
       // expand tabs into spaces (actual tabs break reversed highlighting)
       do {
         rv[cursor++] = ' ';
         visible_chars++;
       } while (renderer->width > visible_chars && visible_chars % 8 != 0);
     } else if (renderer->width > visible_chars) {
-      rv[cursor++] = string_get_char_at(score->line, i);
+      rv[cursor++] = score->line->buf[i];
       visible_chars++;
     }
     if (renderer->width <= visible_chars) {

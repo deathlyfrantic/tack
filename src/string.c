@@ -30,24 +30,6 @@ String *string_new_from(char *source) {
   return string;
 }
 
-const char *string_raw(String *s) {
-  return s->buf;
-}
-
-const char *string_raw_low(String *s) {
-  return s->low;
-}
-
-char string_get_char_at(String *s, size_t i) {
-  if (i > s->length) return '\0';
-  return s->buf[i];
-}
-
-char string_get_ichar_at(String *s, size_t i) {
-  if (i > s->length) return '\0';
-  return s->low[i];
-}
-
 void string_push_char(String *s, char c) {
   if (s->length == s->capacity) {
     string_grow(s, s->capacity * 2);
