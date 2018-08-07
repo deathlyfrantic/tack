@@ -18,6 +18,10 @@ enum match_type {
   MATCH_TYPE_NORMAL,
 };
 
+static bool is_boundary_char(char c) {
+  return !isalnum(c) && c != '_';
+}
+
 Score *score_new() {
   Score *score = malloc(sizeof(Score));
   score->points = UINT16_MAX;
@@ -50,7 +54,7 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
         last_match_type = MATCH_TYPE_SEQUENTIAL;
         score++;
       }
-    } else if (index > 0 && !isalnum(line->buf[index - 1])) {
+    } else if (index > 0 && is_boundary_char(line->buf[index - 1])) {
       if (last_match_type != MATCH_TYPE_BOUNDARY) {
         last_match_type = MATCH_TYPE_BOUNDARY;
         score++;
