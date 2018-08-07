@@ -15,10 +15,6 @@ typedef struct {
 
 String *string_new();
 String *string_new_from(char *);
-const char *string_raw(String *);
-const char *string_raw_low(String *);
-char string_get_char_at(String *, size_t);
-char string_get_ichar_at(String *, size_t);
 void string_push_char(String *, char);
 char string_pop_char(String *);
 void string_concat(String *, const char *);

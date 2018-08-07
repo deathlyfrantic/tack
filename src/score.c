@@ -28,7 +28,7 @@ Score *score_new() {
 }
 
 static bool single_char_query(Score *score, String *query) {
-  int32_t idx = string_find_ichar(score->line, string_get_char_at(query, 0));
+  int32_t idx = string_find_ichar(score->line, query->buf[0]);
   if (idx == -1) return false;
   score->first = idx;
   score->last = idx + 1;
@@ -42,8 +42,7 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
   int32_t index;
   enum match_type last_match_type = MATCH_TYPE_NORMAL;
   for (size_t i = 1; i < query->length; i++) {
-    index =
-      string_find_ichar_from(line, string_get_char_at(query, i), last_index);
+    index = string_find_ichar_from(line, query->buf[i], last_index);
     if (index == -1) return false;
     index += last_index;
     if (index == last_index + 1) {
@@ -51,7 +50,7 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
         last_match_type = MATCH_TYPE_SEQUENTIAL;
         score++;
       }
-    } else if (index > 0 && !isalnum(string_get_char_at(line, index - 1))) {
+    } else if (index > 0 && !isalnum(line->buf[index - 1])) {
       if (last_match_type != MATCH_TYPE_BOUNDARY) {
         last_match_type = MATCH_TYPE_BOUNDARY;
         score++;
@@ -70,10 +69,9 @@ static bool find_end_of_match(struct match *m, String *line, String *query,
 static bool regular_query(Score *score, String *query) {
   bool found_score = false;
   struct match m;
-  char query_first_char = string_get_ichar_at(query, 0);
-  const char *raw_low = string_raw_low(score->line);
+  char query_first_char = query->low[0];
   for (size_t i = 0; i < score->line->length; i++) {
-    if (raw_low[i] == query_first_char) {
+    if (score->line->low[i] == query_first_char) {
       if (find_end_of_match(&m, score->line, query, i)) {
         found_score = true;
         if (m.score < score->points) {
@@ -112,7 +110,7 @@ void _score_log(const char *name, Score *score) {
   if (score != NULL) {
     printf(" points %" PRIu16 "; first %" PRIu16 "; last %" PRIu16
            "; line \"%s\"",
-           score->points, score->first, score->last, string_raw(score->line));
+           score->points, score->first, score->last, score->line->buf);
   }
   printf("\n");
 }
