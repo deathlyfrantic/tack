@@ -11,7 +11,9 @@ static void string_grow(String *s, size_t needed) {
     s->capacity += s->size;
   }
   s->buf = realloc(s->buf, sizeof(char) * s->capacity);
+  memset(s->buf + s->length, 0, s->capacity - s->length);
   s->low = realloc(s->low, sizeof(char) * s->capacity);
+  memset(s->low + s->length, 0, s->capacity - s->length);
 }
 
 String *string_new() {
