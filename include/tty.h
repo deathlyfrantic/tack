@@ -1,6 +1,7 @@
 #ifndef TACK_TTY_H
 #define TACK_TTY_H
 
+#include "tack-string.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <termios.h>
@@ -17,7 +18,7 @@ typedef struct {
 
 TTY *tty_new();
 void tty_teardown_and_free(TTY *);
-void tty_write(TTY *, const char *);
+void tty_write(TTY *, String *);
 unsigned char tty_read_char(TTY *);
 
 #endif /* end of include guard: TACK_TTY_H */
