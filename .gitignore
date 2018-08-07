@@ -1,3 +1,4 @@
 tack
 tack_tests
 src/__tests.*
+tack.dSYM
