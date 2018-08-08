@@ -1,4 +1,5 @@
 tack
 tack_tests
-src/__tests.*
+src/__tests.c
+include/__tests.h
 tack.dSYM
