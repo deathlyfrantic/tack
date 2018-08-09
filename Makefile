@@ -1,6 +1,7 @@
 .POSIX:
 
 CC = cc
+PREFIX = /usr/local
 
 all: release
 
@@ -14,5 +15,14 @@ test: clean
 
 debug: clean
 	$(CC) $(CFLAGS) -g -Iinclude $(shell find src -name '*.c' ! -name 'test.c') -o tack $(LDLIBS)
+
 clean:
+	rm -rf tack.DSYM
 	rm -f src/__tests.c include/__tests.h tack_tests tack
+
+install: all
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp -f tack $(DESTDIR)$(PREFIX)/bin
+
+uninstall: clean
+	rm -f $(DESTDIR)$(PREFIX)/bin/tack
