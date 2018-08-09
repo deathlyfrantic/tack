@@ -129,13 +129,14 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   bool need_new_scores = query->length > 0;
   size_t selected = 0;
   TTY *tty = tty_new();
-  Renderer *renderer = renderer_new();
-  renderer->match_length = get_num_strlen(initial_scores->length);
-  renderer->width = tty->columns;
-  renderer->height = MIN(
-    config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1),
-    // "clamp" renderer height if there aren't enough input lines to fill it
-    initial_scores->length + 1);
+  Renderer renderer = {
+    .match_length = get_num_strlen(initial_scores->length),
+    .width = tty->columns,
+    .height = MIN(
+      config->full_height ? tty->rows - 1 : MIN(config->height, tty->rows - 1),
+      // "clamp" renderer height if there aren't enough input lines to fill it
+      initial_scores->length + 1)
+  };
   Score *score;
   char c;
   HashTable *table = hashtable_new();
@@ -151,10 +152,10 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       need_new_scores = false;
     }
     selected = MIN(selected, scores->length - 1);
-    renderer->query = query->buf;
-    renderer->selected = selected;
-    renderer->scores = scores;
-    String *output = renderer_render(renderer);
+    renderer.query = query->buf;
+    renderer.selected = selected;
+    renderer.scores = scores;
+    String *output = renderer_render(&renderer);
     tty_write(tty, output);
     string_free(output);
     switch ((c = tty_read_char(tty))) {
@@ -164,7 +165,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     case '\r': // enter
       goto exit;
     case CTRL_KEY('n'):
-      if (selected < renderer->height - 2) {
+      if (selected < renderer.height - 2) {
         selected++;
       } else {
         selected = 0;
@@ -174,7 +175,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
       if (selected > 0) {
         selected--;
       } else {
-        selected = renderer->height - 2;
+        selected = renderer.height - 2;
       }
       break;
     case CTRL_KEY('w'):
@@ -203,7 +204,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
 exit:;
   // clear all extant output
   String *clear = string_new_from(COLOR_RESET CLEAR_WHOLE_LINE "\r\n");
-  for (size_t i = 0; i < renderer->height; i++) {
+  for (size_t i = 0; i < renderer.height; i++) {
     tty_write(tty, clear);
   }
   string_free(clear);
@@ -215,7 +216,6 @@ exit:;
   }
   hashtable_free_items(table, free_scores);
   hashtable_free(table);
-  free(renderer);
   return killed;
 }
 
