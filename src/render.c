@@ -47,11 +47,6 @@ static void render_line(Renderer *renderer, Score *score, const bool selected,
   string_concat(output, CLEAR_LINE "\r\n");
 }
 
-Renderer *renderer_new() {
-  Renderer *r = calloc(1, sizeof(Renderer));
-  return r;
-}
-
 String *renderer_render(Renderer *r) {
   String *output = string_new_from(HIDE_CURSOR "\r\n");
   Score *score;
@@ -80,8 +75,7 @@ String *renderer_render(Renderer *r) {
 #include "test.h"
 
 void test_render_line() {
-  Renderer *r = renderer_new();
-  r->width = 200;
+  Renderer r = { .width = 200 };
   String *result = string_new();
   String *line = string_new_from("foo\tbarbaz");
   Score *s = score_new();
@@ -91,7 +85,7 @@ void test_render_line() {
   // test expand tabs, highlighting
   char expected1[] = COLOR_RESET "foo     " COLOR_RED "bar" COLOR_DEFAULT
                                  "baz" CLEAR_LINE "\r\n";
-  render_line(r, s, false, result);
+  render_line(&r, s, false, result);
   test_assert(string_equals(result, expected1));
   string_reset(result);
   // test highlighting, reverse for selected line
@@ -100,7 +94,7 @@ void test_render_line() {
   s->first = 3;
   s->last = 6;
   string_set(line, "foobarbaz");
-  render_line(r, s, true, result);
+  render_line(&r, s, true, result);
   test_assert(string_equals(result, expected2));
   string_reset(result);
   // test expand tabs, highlighting
@@ -110,7 +104,7 @@ void test_render_line() {
   string_set(line, "foo\tbar\tbaz\tquux\t\tgarply");
   String *query = string_new_from("qr");
   Score *score = calculate_score(line, query);
-  render_line(r, score, false, result);
+  render_line(&r, score, false, result);
   test_assert(string_equals(result, expected3));
   free(score);
   string_free(query);
@@ -120,29 +114,29 @@ void test_render_line() {
   s->last = 0;
   string_set(line, "foobarbaz");
   char expected4[] = COLOR_RESET "foobarbaz" CLEAR_LINE "\r\n";
-  render_line(r, s, false, result);
+  render_line(&r, s, false, result);
   test_assert(string_equals(result, expected4));
   string_reset(result);
   // test expand tabs by itself
   string_set(line, "foo\tbar");
   char expected5[] = COLOR_RESET "foo     bar" CLEAR_LINE "\r\n";
-  render_line(r, s, false, result);
+  render_line(&r, s, false, result);
   test_assert(string_equals(result, expected5));
   string_reset(result);
   // test expand tabs when tab is only one space wide visibly
   string_set(line, "bazquux\tgarply");
   char expected6[] = COLOR_RESET "bazquux garply" CLEAR_LINE "\r\n";
-  render_line(r, s, false, result);
+  render_line(&r, s, false, result);
   test_assert(string_equals(result, expected6));
   string_reset(result);
   // test line truncation with highlighting
   string_set(line, "foobarbazquuxgarply");
-  r->width = 8;
+  r.width = 8;
   s->first = 3;
   s->last = 6;
   char expected7[] =
     COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "ba" CLEAR_LINE "\r\n";
-  render_line(r, s, false, result);
+  render_line(&r, s, false, result);
   test_assert(string_equals(result, expected7));
   string_free(result);
   string_free(line);

@@ -39,7 +39,6 @@ typedef struct {
   uint16_t selected;
 } Renderer;
 
-Renderer *renderer_new();
 String *renderer_render(Renderer *);
 
 #endif /* end of include guard: TACK_RENDER_H */
