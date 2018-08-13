@@ -165,7 +165,7 @@ static bool run_main_loop(List *initial_scores, Config *config) {
     case '\r': // enter
       goto exit;
     case CTRL_KEY('n'):
-      if (selected < renderer.height - 2) {
+      if (selected < MIN(renderer.height - 2, scores->length - 1)) {
         selected++;
       } else {
         selected = 0;
