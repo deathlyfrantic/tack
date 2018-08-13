@@ -48,7 +48,7 @@ static void render_line(Renderer *renderer, Score *score, const bool selected,
 }
 
 String *renderer_render(Renderer *r) {
-  String *output = string_new_from(HIDE_CURSOR "\r\n");
+  String *output = string_new_without_low_from(HIDE_CURSOR "\r\n");
   Score *score;
   for (size_t i = 0; i < r->height - 1; i++) {
     if (r->scores->length > i) {
@@ -76,7 +76,7 @@ String *renderer_render(Renderer *r) {
 
 void test_render_line() {
   Renderer r = { .width = 200 };
-  String *result = string_new();
+  String *result = string_new_without_low();
   String *line = string_new_from("foo\tbarbaz");
   Score *s = score_new();
   s->first = 4;
