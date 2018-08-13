@@ -12,22 +12,39 @@ static void string_grow(String *s, size_t needed) {
   }
   s->buf = realloc(s->buf, sizeof(char) * s->capacity);
   memset(s->buf + s->length, 0, s->capacity - s->length);
-  s->low = realloc(s->low, sizeof(char) * s->capacity);
-  memset(s->low + s->length, 0, s->capacity - s->length);
+  if (s->has_low) {
+    s->low = realloc(s->low, sizeof(char) * s->capacity);
+    memset(s->low + s->length, 0, s->capacity - s->length);
+  }
+}
+
+static String *_string_new(bool with_low) {
+  String *s = malloc(sizeof(String));
+  s->length = 0;
+  s->capacity = STRING_DEFAULT_CAPACITY;
+  s->size = s->capacity;
+  s->has_low = with_low;
+  s->buf = calloc(s->capacity, sizeof(char));
+  s->low = with_low ? calloc(s->capacity, sizeof(char)) : NULL;
+  return s;
 }
 
 String *string_new() {
-  String *string = malloc(sizeof(String));
-  string->length = 0;
-  string->capacity = STRING_DEFAULT_CAPACITY;
-  string->size = string->capacity;
-  string->buf = calloc(string->capacity, sizeof(char));
-  string->low = calloc(string->capacity, sizeof(char));
-  return string;
+  return _string_new(true);
+}
+
+String *string_new_without_low() {
+  return _string_new(false);
 }
 
 String *string_new_from(char *source) {
   String *string = string_new();
+  string_concat(string, source);
+  return string;
+}
+
+String *string_new_without_low_from(char *source) {
+  String *string = string_new_without_low();
   string_concat(string, source);
   return string;
 }
@@ -37,7 +54,9 @@ void string_push_char(String *s, char c) {
     string_grow(s, s->capacity * 2);
   }
   s->buf[s->length] = c;
-  s->low[s->length] = tolower(c);
+  if (s->has_low) {
+    s->low[s->length] = tolower(c);
+  }
   s->length++;
 }
 
@@ -46,22 +65,26 @@ char string_pop_char(String *s) {
   s->length--;
   char c = s->buf[s->length];
   s->buf[s->length] = '\0';
-  s->low[s->length] = '\0';
+  if (s->has_low) {
+    s->low[s->length] = '\0';
+  }
   return c;
 }
 
 void string_concat(String *string, const char *s) {
   size_t strlen_s = strlen(s);
-  char lowered[strlen_s + 1];
-  memset(&lowered, 0, strlen_s + 1);
-  for (size_t i = 0; i < strlen_s; i++) {
-    lowered[i] = tolower(s[i]);
-  }
   if (string->length + strlen_s + 1 > string->capacity) {
     string_grow(string, string->length + strlen_s + 1);
   }
   strcat(string->buf, s);
-  strcat(string->low, lowered);
+  if (string->has_low) {
+    char lowered[strlen_s + 1];
+    memset(&lowered, 0, strlen_s + 1);
+    for (size_t i = 0; i < strlen_s; i++) {
+      lowered[i] = tolower(s[i]);
+    }
+    strcat(string->low, lowered);
+  }
   string->length += strlen_s;
 }
 
@@ -85,7 +108,9 @@ void string_set(String *string, const char *s) {
 
 void string_reset(String *s) {
   memset(s->buf, 0, s->length);
-  memset(s->low, 0, s->length);
+  if (s->has_low) {
+    memset(s->low, 0, s->length);
+  }
   s->length = 0;
 }
 
@@ -96,7 +121,9 @@ bool string_equals(String *string, const char *s) {
 void string_free(String *s) {
   if (s == NULL) return;
   free(s->buf);
-  free(s->low);
+  if (s->has_low) {
+    free(s->low);
+  }
   free(s);
 }
 
@@ -114,6 +141,7 @@ int32_t string_find_char(String *s, char c) {
 }
 
 int32_t string_find_ichar(String *s, char c) {
+  if (!s->has_low) return -1;
   return find_char(s->low, s->length, tolower(c));
 }
 
@@ -123,7 +151,7 @@ int32_t string_find_char_from(String *s, char c, size_t start) {
 }
 
 int32_t string_find_ichar_from(String *s, char c, size_t start) {
-  if (start > s->length) return -1;
+  if (start > s->length || !s->has_low) return -1;
   return find_char(s->low + start, s->length - start, tolower(c));
 }
 
