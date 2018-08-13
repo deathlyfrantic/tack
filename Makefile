@@ -5,7 +5,7 @@ PREFIX = /usr/local
 
 all: release
 
-release: clean
+release: clean man
 	$(CC) $(CFLAGS) -O3 -Iinclude $(shell find src -name '*.c' ! -name 'test.c') -o tack $(LDLIBS)
 
 test: clean
@@ -23,6 +23,12 @@ clean:
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp -f tack $(DESTDIR)$(PREFIX)/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
+	cp -f tack.1 $(DESTDIR)$(PREFIX)/share/man/man1
 
-uninstall: clean
+uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/tack
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/tack.1
+
+man:
+	scdoc < tack.1.scd > tack.1
