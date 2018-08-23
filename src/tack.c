@@ -211,8 +211,12 @@ exit:;
   tty_teardown_and_free(tty);
   if (!killed) {
     // write selected line to stdout
-    score = scores->items[selected];
-    puts(score->line->buf);
+    if (scores->length == 0 || selected > scores->length) {
+      puts("");
+    } else {
+      score = scores->items[selected];
+      puts(score->line->buf);
+    }
   }
   hashtable_free_items(table, free_scores);
   hashtable_free(table);
