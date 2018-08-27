@@ -41,10 +41,7 @@ static void render_line(Renderer *renderer, Score *score, const bool selected,
       break;
     }
   }
-  if (selected) {
-    string_concat(output, COLOR_RESET);
-  }
-  string_concat(output, CLEAR_LINE "\r\n");
+  string_concat(output, COLOR_RESET CLEAR_LINE "\r\n");
 }
 
 String *renderer_render(Renderer *r) {
