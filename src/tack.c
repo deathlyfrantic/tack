@@ -203,10 +203,8 @@ static bool run_main_loop(List *initial_scores, Config *config) {
   }
 exit:;
   // clear all extant output
-  String *clear = string_new_from(COLOR_RESET CLEAR_WHOLE_LINE "\r\n");
-  for (size_t i = 0; i < renderer.height; i++) {
-    tty_write(tty, clear);
-  }
+  String *clear = string_new_from("\r" CLEAR_AFTER_CURSOR);
+  tty_write(tty, clear);
   string_free(clear);
   tty_teardown_and_free(tty);
   if (!killed) {
