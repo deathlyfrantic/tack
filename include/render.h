@@ -28,6 +28,7 @@
 #define SHOW_CURSOR        "\e[?25h"
 #define CLEAR_LINE         "\e[0K"
 #define CLEAR_WHOLE_LINE   "\e[2K"
+#define CLEAR_AFTER_CURSOR "\e[J"
 // clang-format on
 
 typedef struct {
