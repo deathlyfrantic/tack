@@ -81,7 +81,7 @@ void test_render_line() {
   s->line = line;
   // test expand tabs, highlighting
   char expected1[] = COLOR_RESET "foo     " COLOR_RED "bar" COLOR_DEFAULT
-                                 "baz" CLEAR_LINE "\r\n";
+                                 "baz" COLOR_RESET CLEAR_LINE "\r\n";
   render_line(&r, s, false, result);
   test_assert(string_equals(result, expected1));
   string_reset(result);
@@ -95,9 +95,9 @@ void test_render_line() {
   test_assert(string_equals(result, expected2));
   string_reset(result);
   // test expand tabs, highlighting
-  char expected3[] =
-    COLOR_RESET "foo     bar     baz     " COLOR_RED
-                "quux            gar" COLOR_DEFAULT "ply" CLEAR_LINE "\r\n";
+  char expected3[] = COLOR_RESET "foo     bar     baz     " COLOR_RED
+                                 "quux            gar" COLOR_DEFAULT
+                                 "ply" COLOR_RESET CLEAR_LINE "\r\n";
   string_set(line, "foo\tbar\tbaz\tquux\t\tgarply");
   String *query = string_new_from("qr");
   Score *score = calculate_score(line, query);
@@ -110,19 +110,19 @@ void test_render_line() {
   s->first = 0;
   s->last = 0;
   string_set(line, "foobarbaz");
-  char expected4[] = COLOR_RESET "foobarbaz" CLEAR_LINE "\r\n";
+  char expected4[] = COLOR_RESET "foobarbaz" COLOR_RESET CLEAR_LINE "\r\n";
   render_line(&r, s, false, result);
   test_assert(string_equals(result, expected4));
   string_reset(result);
   // test expand tabs by itself
   string_set(line, "foo\tbar");
-  char expected5[] = COLOR_RESET "foo     bar" CLEAR_LINE "\r\n";
+  char expected5[] = COLOR_RESET "foo     bar" COLOR_RESET CLEAR_LINE "\r\n";
   render_line(&r, s, false, result);
   test_assert(string_equals(result, expected5));
   string_reset(result);
   // test expand tabs when tab is only one space wide visibly
   string_set(line, "bazquux\tgarply");
-  char expected6[] = COLOR_RESET "bazquux garply" CLEAR_LINE "\r\n";
+  char expected6[] = COLOR_RESET "bazquux garply" COLOR_RESET CLEAR_LINE "\r\n";
   render_line(&r, s, false, result);
   test_assert(string_equals(result, expected6));
   string_reset(result);
@@ -131,8 +131,8 @@ void test_render_line() {
   r.width = 8;
   s->first = 3;
   s->last = 6;
-  char expected7[] =
-    COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT "ba" CLEAR_LINE "\r\n";
+  char expected7[] = COLOR_RESET "foo" COLOR_RED "bar" COLOR_DEFAULT
+                                 "ba" COLOR_RESET CLEAR_LINE "\r\n";
   render_line(&r, s, false, result);
   test_assert(string_equals(result, expected7));
   string_free(result);
