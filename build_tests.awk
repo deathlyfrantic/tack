@@ -5,11 +5,7 @@ BEGIN {
 }
 $0 == "#ifdef TESTS" { in_tests = 1 }
 in_tests == 1 && $0 == "#endif" { in_tests = 0 }
-in_tests == 1 && /^void test_/ {
-    gsub("void ", "")
-    gsub(" {", "")
-    tests[NR] = $0
-}
+in_tests == 1 && /^void test_/ { tests[NR] = $2 }
 END {
     print "#ifndef TACK_TESTS_H\n" \
           "#define TACK_TESTS_H\n\n" \
